@@ -1,0 +1,19 @@
+{
+	"version": "0.1.0",
+
+	"command": "npm",
+    "args": [
+        "run",
+        "build"
+    ],       
+
+	// The command is a shell script
+	"isShellCommand": true,
+
+	// Show the output window only if unrecognized errors occur.
+	"showOutput": "silent",
+
+	// use the standard tsc problem matcher to find compile problems
+	// in the output.
+	"problemMatcher": "$tsc"
+}

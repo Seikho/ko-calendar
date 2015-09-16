@@ -1,0 +1,30 @@
+{
+  "name": "ko-calendar",
+  "version": "0.0.1",
+  "description": "Knockout Calendar API",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seikho/ko-calendar.git"
+  },
+  "keywords": [
+    "typescript",
+    "knockout",
+    "calendar",
+    "api",
+    "date"
+  ],
+  "author": "Carl Winkler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seikho/ko-calendar/issues"
+  },
+  "homepage": "https://github.com/seikho/ko-calendar#readme",
+  "devDependencies": {
+    "typescript": "1.6.0-beta"
+  }
+}
