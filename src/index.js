@@ -6,11 +6,33 @@ if (typeof ko === 'undefined' && !requireExists)
     throw new Error("Unable to load knockout");
 ko = ko || typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
 var Calendar = (function () {
-    function Calendar() {
+    function Calendar(parser) {
         var _this = this;
+        this.parser = function (userObject) {
+            // Default behaviour
+            // This should be overridden by the consumer
+            if (userObject instanceof Date)
+                return userObject;
+            var date = userObject.date;
+            if (date instanceof Date)
+                return date;
+            if (typeof date === 'string') {
+                var returnDate = new Date(date);
+                if (!isNaN(returnDate.getTime()))
+                    return returnDate;
+            }
+            throw new Error("Invalid object parsed [" + JSON.stringify(userObject) + "]");
+        };
         this.events = ko.observableArray([]);
         this.startDay = ko.observable(0);
         this.endDay = ko.computed(function () { return _this.startDay() + 6; });
+        if (!parser)
+            return;
+        if (typeof parser !== 'function') {
+            console.warn('Parser function provided is not a function and has been ignored');
+            return;
+        }
+        this.parser = parser;
     }
     Calendar.prototype.addEvent = function (date, object) {
     };
@@ -74,6 +96,8 @@ var Calendar = (function () {
         if (currentDay < toDay)
             upDate.setDate(upDate.getDate() + (toDay - currentDay));
         return this.ceilToDay(upDate);
+    };
+    Calendar.prototype.getExtremities = function () {
     };
     return Calendar;
 })();

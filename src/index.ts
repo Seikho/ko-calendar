@@ -9,7 +9,35 @@ if (typeof ko === 'undefined' && !requireExists)
 ko = ko || typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
 
 export class Calendar {
+    
+    constructor(parser?: Parser) {
+        if (!parser) return;
+        
+        if (typeof parser !== 'function') {
+            console.warn('Parser function provided is not a function and has been ignored');
+            return;
+        }
+        
+        this.parser = parser;
+    }
 
+    parser = (userObject: any) => {
+        // Default behaviour
+        // This should be overridden by the consumer
+        if (userObject instanceof Date) return userObject;
+        
+        var date = userObject.date;
+        
+        if (date instanceof Date) return date;
+        
+        if (typeof date === 'string') {
+            var returnDate = new Date(date);
+            if (!isNaN(returnDate.getTime())) return returnDate;
+        }
+        
+        throw new Error(`Invalid object parsed [${JSON.stringify(userObject)}]`);
+                 
+    }
     events: KnockoutObservableArray<any> = ko.observableArray([]);
     startDay = ko.observable(0);
     endDay = ko.computed(() => this.startDay() + 6);
@@ -18,15 +46,15 @@ export class Calendar {
 
     }
 
-    getEventsForDate(date: Date | number, dateDay?: number): any[] {
+    getEventsForDate(date: Date | number, dateDay?: number): DayEvent {
         return null;
     }
 
-    getEvents(): any[] {
+    getEvents(): Array<DayEvent> {
         return null;
     }
 
-    getEventsByWeek(): WeekEvents {
+    getEventsByWeek(): Array<WeekEvent> {
         return null;
     }
 
@@ -57,8 +85,8 @@ export class Calendar {
 
         var leftFloor = this.floorToWeekStart(left);
         var leftCeil = this.ceilingToWeekEnd(left);
-        
-        return right >= leftFloor && right < leftCeil;  
+
+        return right >= leftFloor && right < leftCeil;
     }
 
     floorToDay(date: Date) {
@@ -98,9 +126,24 @@ export class Calendar {
 
         return this.ceilToDay(upDate);
     }
+    
+    getExtremities() {
+        
+    }
 }
 
-interface WeekEvents {
-    [weekNumber: number]: { [dayNumber: number]: any[] }
+interface WeekEvent {
+    weekNumber: number;
+    start: Date,
+    end: Date,
+    days: Array<DayEvent>;
 }
 
+interface DayEvent {
+    date: Date;
+    events: any[];
+}
+
+interface Parser {
+    (userObject: any): Date;
+}
