@@ -58,7 +58,7 @@ export class Calendar {
         var leftFloor = this.floorToWeekStart(left);
         var leftCeil = this.ceilingToWeekEnd(left);
         
-        return right >= leftFloor && right <= leftCeil;  
+        return right >= leftFloor && right < leftCeil;  
     }
 
     floorToDay(date: Date) {

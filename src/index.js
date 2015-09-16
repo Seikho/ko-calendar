@@ -45,7 +45,7 @@ var Calendar = (function () {
             return false;
         var leftFloor = this.floorToWeekStart(left);
         var leftCeil = this.ceilingToWeekEnd(left);
-        return right >= leftFloor && right <= leftCeil;
+        return right >= leftFloor && right < leftCeil;
     };
     Calendar.prototype.floorToDay = function (date) {
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
