@@ -1,6 +1,10 @@
-if (typeof ko === 'undefined' && typeof window['require'] === 'undefined')
+var ko;
+var requireExists = typeof window === 'undefined'
+    ? typeof require === 'function'
+    : typeof window['require'] === 'function';
+if (typeof ko === 'undefined' && !requireExists)
     throw new Error("Unable to load knockout");
-ko = ko || window['require']('ko');
+ko = ko || typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
 var Calendar = (function () {
     function Calendar() {
         var _this = this;
