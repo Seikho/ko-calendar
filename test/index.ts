@@ -18,6 +18,18 @@ describe('equivalence tests', () => {
         expect(cal.isSameDate(first, second)).to.be.false;
     });
 
+    it('will correctly find two days are in the same week', () => {
+        var first = new Date(2015, 8, 13, 0, 0, 0); // Sun 13 Sep 2015 00:00:00
+        var second = new Date(2015, 8, 19, 23, 59, 59); // Sun 19 Sep 2015 23:59:59
+        expect(cal.isSameWeek(first, second)).to.be.true;
+    });
+
+    it('will correctly find two are are not in the same week', () => {
+        var first = new Date(2015, 8, 13, 0, 0, 0); // Sun 13 Sep 2015
+        var second = new Date(2015, 8, 20, 0, 0, 0); // Sun 20 Sep 2015 00:00:00
+        expect(cal.isSameWeek(first, second)).to.be.false;
+    });
+
 });
 
 describe('floor and ceiling tests', () => {
@@ -62,6 +74,6 @@ describe('floor and ceiling tests', () => {
         expect(ceil.getHours()).to.equal(0);
         expect(ceil.getMinutes()).to.equal(0);
     });
-    
+
 
 });
