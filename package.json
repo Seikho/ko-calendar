@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha",
-    "build": "tsc && browserify src/index.ts -o ko-calendar.js"
+    "build": "tsc && browserify src/index.ts --no-bundle-external -o ko-calendar.js"
   },
   "repository": {
     "type": "git",
