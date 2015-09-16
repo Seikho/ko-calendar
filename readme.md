@@ -1,1 +1,4 @@
 ### ko-calendar
+
+### License
+MIT
