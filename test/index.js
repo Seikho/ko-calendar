@@ -27,7 +27,7 @@ describe('floor and ceiling tests', function () {
         var now = new Date();
         var tomorrow = now;
         tomorrow.setDate(tomorrow.getDate() + 1);
-        var ceil = cal.ceilingToDay(now);
+        var ceil = cal.ceilToDay(now);
         expect(cal.isSameDate(tomorrow, ceil)).to.be.true;
         expect(ceil.getHours()).to.equal(0);
         expect(ceil.getMinutes()).to.equal(0);

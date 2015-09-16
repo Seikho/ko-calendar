@@ -55,14 +55,17 @@ export class Calendar {
         var sameMonth = left.getMonth() === right.getMonth();
         if (!sameYear || !sameMonth) return false;
 
-
+        var leftFloor = this.floorToWeekStart(left);
+        var leftCeil = this.ceilingToWeekEnd(left);
+        
+        return right >= leftFloor && right <= leftCeil;  
     }
 
     floorToDay(date: Date) {
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     }
 
-    ceilingToDay(date: Date) {
+    ceilToDay(date: Date) {
         var upDate = date;
         upDate.setDate(upDate.getDate() + 1);
         return new Date(upDate.getFullYear(), upDate.getMonth(), upDate.getDate());
@@ -93,7 +96,7 @@ export class Calendar {
         if (currentDay < toDay)
             upDate.setDate(upDate.getDate() + (toDay - currentDay));
 
-        return this.ceilingToDay(upDate);
+        return this.ceilToDay(upDate);
     }
 }
 

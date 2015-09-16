@@ -43,11 +43,14 @@ var Calendar = (function () {
         var sameMonth = left.getMonth() === right.getMonth();
         if (!sameYear || !sameMonth)
             return false;
+        var leftFloor = this.floorToWeekStart(left);
+        var leftCeil = this.ceilingToWeekEnd(left);
+        return right >= leftFloor && right <= leftCeil;
     };
     Calendar.prototype.floorToDay = function (date) {
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     };
-    Calendar.prototype.ceilingToDay = function (date) {
+    Calendar.prototype.ceilToDay = function (date) {
         var upDate = date;
         upDate.setDate(upDate.getDate() + 1);
         return new Date(upDate.getFullYear(), upDate.getMonth(), upDate.getDate());
@@ -70,7 +73,7 @@ var Calendar = (function () {
             upDate.setDate(upDate.getDate() + (7 - currentDay + toDay));
         if (currentDay < toDay)
             upDate.setDate(upDate.getDate() + (toDay - currentDay));
-        return this.ceilingToDay(upDate);
+        return this.ceilToDay(upDate);
     };
     return Calendar;
 })();
