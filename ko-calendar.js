@@ -8,15 +8,16 @@ ko = ko || typeof window === 'undefined' ? require('knockout') : window['require
 var Calendar = (function () {
     function Calendar(parser) {
         var _this = this;
+        this.eventsDate = ko.observable(new Date());
         this.parser = function (userObject) {
             // Default behaviour
             // This should be overridden by the consumer
             if (userObject instanceof Date)
-                return userObject;
+                return new Date(userObject.getTime());
             var date = userObject.date;
             if (date instanceof Date)
                 return date;
-            if (typeof date === 'string') {
+            if (typeof date === 'string' || typeof date === 'number') {
                 var returnDate = new Date(date);
                 if (!isNaN(returnDate.getTime()))
                     return returnDate;
@@ -24,8 +25,67 @@ var Calendar = (function () {
             throw new Error("Invalid object parsed [" + JSON.stringify(userObject) + "]");
         };
         this.events = ko.observableArray([]);
+        this.parsedEvents = ko.computed(function () {
+            var parsed = _this.events().map(function (userObject) {
+                return {
+                    date: _this.parser(userObject),
+                    value: userObject
+                };
+            });
+            return _this.sortByDate(parsed);
+        });
         this.startDay = ko.observable(0);
         this.endDay = ko.computed(function () { return _this.startDay() + 6; });
+        this.eventsForDate = ko.computed(function () {
+            var forDate = _this.eventsDate();
+            var events = _this.parsedEvents().filter(function (event) { return _this.isSameDate(forDate, event.date); });
+            return {
+                date: _this.floorToDay(forDate),
+                events: events
+            };
+        });
+        this.eventsByDay = ko.computed(function () {
+            var events = _this.parsedEvents();
+            var range = _this.getDateRange();
+            var dayEvents = [];
+            var iterator = new Date(range.start.getTime());
+            while (iterator < range.end) {
+                var currentEvents = events.filter(function (event) { return _this.isSameDate(iterator, event.date); });
+                dayEvents.push({
+                    date: new Date(iterator.getTime()),
+                    events: currentEvents
+                });
+                iterator.setDate(iterator.getDate() + 1);
+            }
+            return dayEvents;
+        });
+        this.eventsByWeek = ko.computed(function () {
+            var events = _this.parsedEvents();
+            var range = _this.getDateRange();
+            var weekEvents = [];
+            var iterator = range.start;
+            var weekNumber = 1;
+            while (iterator < range.end) {
+                var currentDay = iterator;
+                var endOfWeek = _this.ceilToWeekEnd(iterator);
+                var week = {
+                    start: iterator,
+                    end: endOfWeek,
+                    weekNumber: weekNumber,
+                    days: []
+                };
+                while (currentDay < endOfWeek) {
+                    var dayEvents = events.filter(function (event) { return _this.isSameDate(currentDay, event.date); });
+                    week.days.push({
+                        date: currentDay,
+                        events: dayEvents
+                    });
+                    currentDay.setDate(currentDay.getDate() + 1);
+                }
+                weekEvents.push(week);
+            }
+            return weekEvents;
+        });
         if (!parser)
             return;
         if (typeof parser !== 'function') {
@@ -35,19 +95,16 @@ var Calendar = (function () {
         this.parser = parser;
     }
     Calendar.prototype.addEvent = function (userObject) {
+        this.events.push(userObject);
     };
-    Calendar.prototype.getEventsForDate = function (date, dateDay) {
-        return null;
-    };
-    Calendar.prototype.getEvents = function () {
-        return null;
-    };
-    Calendar.prototype.getEventsByWeek = function () {
-        return null;
+    Calendar.prototype.sortByDate = function (events) {
+        var newArray = events.slice();
+        return newArray.sort(function (left, right) { return left.date > right.date ? 1 : -1; });
     };
     Calendar.prototype.weeksInDateRange = function (start, end) {
         var weeks = 0;
-        var iterator = start;
+        var iterator = new Date(start.getTime());
+        ;
         while (iterator <= end) {
             weeks++;
             iterator.setDate(iterator.getDate() + 7);
@@ -67,20 +124,18 @@ var Calendar = (function () {
             return false;
         var leftFloor = this.floorToWeekStart(left);
         var leftCeil = this.ceilToWeekEnd(left);
-        return right >= leftFloor && right < leftCeil;
+        return right >= leftFloor && right <= leftCeil;
     };
     Calendar.prototype.floorToDay = function (date) {
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     };
     Calendar.prototype.ceilToDay = function (date) {
-        var upDate = date;
-        upDate.setDate(upDate.getDate() + 1);
-        return new Date(upDate.getFullYear(), upDate.getMonth(), upDate.getDate());
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
     };
     Calendar.prototype.floorToWeekStart = function (date) {
         var currentDay = date.getDay();
         var toDay = this.startDay();
-        var downDate = date;
+        var downDate = new Date(date.getTime());
         if (currentDay > toDay)
             downDate.setDate(downDate.getDate() - (currentDay - toDay));
         if (currentDay < toDay)
@@ -90,15 +145,30 @@ var Calendar = (function () {
     Calendar.prototype.ceilToWeekEnd = function (date) {
         var currentDay = date.getDay();
         var toDay = this.endDay();
-        var upDate = date;
+        var upDate = new Date(date.getTime());
         if (currentDay > toDay)
             upDate.setDate(upDate.getDate() + (7 - currentDay + toDay));
         if (currentDay < toDay)
             upDate.setDate(upDate.getDate() + (toDay - currentDay));
         return this.ceilToDay(upDate);
     };
-    Calendar.prototype.getExtremities = function () {
-        return null;
+    Calendar.prototype.getDateRange = function () {
+        var events = this.parsedEvents();
+        var start, end;
+        events.forEach(function (event) {
+            if (start == null || event.date < start)
+                start = new Date(event.date.getTime());
+            if (end == null || event.date > end)
+                end = new Date(event.date.getTime());
+        });
+        if (start == null)
+            start = new Date();
+        if (end == null)
+            end = new Date(start.getTime());
+        // We get a little bit opinionated here...
+        start = this.floorToWeekStart(start);
+        end = this.ceilToWeekEnd(end);
+        return { start: start, end: end };
     };
     return Calendar;
 })();
