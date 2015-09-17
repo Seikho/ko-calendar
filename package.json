@@ -2,7 +2,7 @@
   "name": "ko-calendar",
   "version": "0.0.1",
   "description": "Knockout Calendar API",
-  "main": "src/index.js",
+  "main": "ko-calendar.js",
   "scripts": {
     "test": "mocha",
     "build": "tsc"
