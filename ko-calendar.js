@@ -1,4 +1,3 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var ko;
 var requireExists = typeof window === 'undefined'
     ? typeof require === 'function'
@@ -35,7 +34,7 @@ var Calendar = (function () {
         }
         this.parser = parser;
     }
-    Calendar.prototype.addEvent = function (date, object) {
+    Calendar.prototype.addEvent = function (userObject) {
     };
     Calendar.prototype.getEventsForDate = function (date, dateDay) {
         return null;
@@ -67,7 +66,7 @@ var Calendar = (function () {
         if (!sameYear || !sameMonth)
             return false;
         var leftFloor = this.floorToWeekStart(left);
-        var leftCeil = this.ceilingToWeekEnd(left);
+        var leftCeil = this.ceilToWeekEnd(left);
         return right >= leftFloor && right < leftCeil;
     };
     Calendar.prototype.floorToDay = function (date) {
@@ -88,7 +87,7 @@ var Calendar = (function () {
             downDate.setDate(downDate.getDate() - (currentDay + (7 - toDay)));
         return this.floorToDay(downDate);
     };
-    Calendar.prototype.ceilingToWeekEnd = function (date) {
+    Calendar.prototype.ceilToWeekEnd = function (date) {
         var currentDay = date.getDay();
         var toDay = this.endDay();
         var upDate = date;
@@ -99,9 +98,9 @@ var Calendar = (function () {
         return this.ceilToDay(upDate);
     };
     Calendar.prototype.getExtremities = function () {
+        return null;
     };
     return Calendar;
 })();
 exports.Calendar = Calendar;
-
-},{"knockout":undefined}]},{},[1]);
+//# sourceMappingURL=ko-calendar.js.map
