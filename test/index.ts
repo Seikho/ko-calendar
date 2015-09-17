@@ -1,8 +1,10 @@
 import chai = require('chai');
-import KoCal = require('../src/index');
+import Types = require("ko-calendar");
+var KoCal = require('../ko-calendar');
+console.log(KoCal);
 var expect = chai.expect;
 
-var cal = new KoCal.Calendar();
+var cal: Types.Calendar = new KoCal.Calendar();
 
 describe('equivalence tests', () => {
 
@@ -68,7 +70,7 @@ describe('floor and ceiling tests', () => {
 
     it('will correctly ceiling a date to end of week', () => {
         var now = new Date(2015, 8, 16); // Wed 16 Sep 2015 00:00:00
-        var ceil = cal.ceilingToWeekEnd(now);
+        var ceil = cal.ceilToWeekEnd(now);
         var expected = new Date(2015, 8, 20); // Sun 20 Sep 2015 00:00:00
         expect(cal.isSameDate(ceil, expected)).to.be.true;
         expect(ceil.getHours()).to.equal(0);
