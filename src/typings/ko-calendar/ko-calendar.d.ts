@@ -13,7 +13,7 @@ declare module "ko-calendar" {
         
         endDay: KnockoutComputed<number>;
 
-        addEvent(event: any): void;
+        addEvent(userObject: any): void;
         
         getEvents(): Array<DayEvent>;
         
