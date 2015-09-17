@@ -8,25 +8,25 @@ var cal: Types.Calendar = new KoCal.Calendar();
 
 describe('equivalence tests', () => {
 
-    it('will correctly find two dates equivalent', () => {
+    it('will find two dates equivalent', () => {
         var first = new Date(2015, 1, 1, 1, 1, 1);
         var second = new Date(2015, 1, 1, 23, 59, 59);
         expect(cal.isSameDate(first, second)).to.be.true;
     });
 
-    it('will correctly find two dates to not be equivalent', () => {
+    it('will find two dates to not be equivalent', () => {
         var first = new Date(2015, 1, 1, 1, 1, 1);
         var second = new Date(2015, 1, 2, 0, 0, 1);
         expect(cal.isSameDate(first, second)).to.be.false;
     });
 
-    it('will correctly find two days are in the same week', () => {
+    it('will find two days are in the same week', () => {
         var first = new Date(2015, 8, 13, 0, 0, 0); // Sun 13 Sep 2015 00:00:00
         var second = new Date(2015, 8, 19, 23, 59, 59); // Sun 19 Sep 2015 23:59:59
         expect(cal.isSameWeek(first, second)).to.be.true;
     });
 
-    it('will correctly find two are are not in the same week', () => {
+    it('will find two are are not in the same week', () => {
         var first = new Date(2015, 8, 13, 0, 0, 0); // Sun 13 Sep 2015
         var second = new Date(2015, 8, 20, 0, 0, 0); // Sun 20 Sep 2015 00:00:00
         expect(cal.isSameWeek(first, second)).to.be.false;
@@ -36,7 +36,7 @@ describe('equivalence tests', () => {
 
 describe('floor and ceiling tests', () => {
 
-    it('will correctly floor a given date', () => {
+    it('will floor a given date', () => {
         var now = new Date();
         var floor = cal.floorToDay(now);
 
@@ -46,20 +46,28 @@ describe('floor and ceiling tests', () => {
         expect(floor.getSeconds()).to.equal(0);
     });
 
-    it('will correctly ceiling a given date', () => {
+    it('will ceil a given date', () => {
         var now = new Date();
 
-        var tomorrow = now;
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
         var ceil = cal.ceilToDay(now);
-        expect(cal.isSameDate(tomorrow, ceil)).to.be.true;
-        expect(ceil.getHours()).to.equal(0);
-        expect(ceil.getMinutes()).to.equal(0);
-        expect(ceil.getSeconds()).to.equal(0);
+        expect(cal.isSameDate(now, ceil)).to.be.true;
+        expect(ceil.getHours()).to.equal(23);
+        expect(ceil.getMinutes()).to.equal(59);
+        expect(ceil.getSeconds()).to.equal(59);
+        expect(ceil.getMilliseconds()).to.equal(999);
+    });
+    
+    it('will ceil a date that has 00:00:00 time to 23:59:59.999 the same day', () => {
+       var testDate = new Date(2015, 1, 1, 0, 0, 0);
+       var ceil = cal.ceilToDay(testDate);
+       expect(ceil.getDate()).to.equal(1);
+       expect(ceil.getHours()).to.equal(23);
+       expect(ceil.getMinutes()).to.equal(59);
+       expect(ceil.getSeconds()).to.equal(59);
+       expect(ceil.getMilliseconds()).to.equal(999);        
     });
 
-    it('will correctly floor a date to start of week', () => {
+    it('will floor a date to start of week', () => {
         var now = new Date(2015, 8, 16); // Wed 16 Sep 2015
         var floor = cal.floorToWeekStart(now);
         var expected = new Date(2015, 8, 13); // Sun 13 Sep 2015
@@ -68,13 +76,15 @@ describe('floor and ceiling tests', () => {
         expect(floor.getMinutes()).to.equal(0);
     });
 
-    it('will correctly ceiling a date to end of week', () => {
+    it('will ceil a date to end of week', () => {
         var now = new Date(2015, 8, 16); // Wed 16 Sep 2015 00:00:00
         var ceil = cal.ceilToWeekEnd(now);
-        var expected = new Date(2015, 8, 20); // Sun 20 Sep 2015 00:00:00
+        var expected = new Date(2015, 8, 19); // Sun 19 Sep 2015 23:59:59.000
         expect(cal.isSameDate(ceil, expected)).to.be.true;
-        expect(ceil.getHours()).to.equal(0);
-        expect(ceil.getMinutes()).to.equal(0);
+        expect(ceil.getHours()).to.equal(23);
+        expect(ceil.getMinutes()).to.equal(59);
+        expect(ceil.getSeconds()).to.equal(59);
+        expect(ceil.getMilliseconds()).to.equal(999);
     });
 
 
