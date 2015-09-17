@@ -27,7 +27,7 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "mocha": "^2.3.2",
-    "typescript": "1.6.0-beta"
+    "typescript": "^1.6.2"
   },
   "dependencies": {
     "knockout": "^3.3.0"
