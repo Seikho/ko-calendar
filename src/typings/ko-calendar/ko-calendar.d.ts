@@ -37,7 +37,7 @@ declare module "ko-calendar" {
         
         ceilToWeekEnd(date: Date): Date;
         
-        getExtremities(userObjects: any[]): DateRange;        
+        getDateRange(userObjects: any[]): DateRange;        
     }
 
     interface Parser {
@@ -51,7 +51,7 @@ declare module "ko-calendar" {
 
     interface DayEvent {
         date: Date;
-        events: any[];
+        events: Event[];
     }
     
     interface Event {
