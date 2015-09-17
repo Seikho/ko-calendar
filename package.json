@@ -31,5 +31,6 @@
     "knockout": "^3.3.0"
   },
   "dependencies": {
-  }
+  },
+  "typings": "src/typings/ko-calendar/ko-calendar.d.ts"
 }
