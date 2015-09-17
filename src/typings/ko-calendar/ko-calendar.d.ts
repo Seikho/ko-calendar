@@ -7,6 +7,8 @@ declare module "ko-calendar" {
         
         parser: Parser;
         
+        eventsDate: KnockoutObservable<Date>;
+        
         events: KnockoutObservableArray<any>;
         
         startDay: KnockoutObservable<number>;
@@ -15,11 +17,11 @@ declare module "ko-calendar" {
 
         addEvent(userObject: any): void;
         
-        getEvents(): Array<DayEvent>;
+        eventsByDay: KnockoutComputed<Array<DayEvent>>;
         
-        getEventsByWeek(): Array<WeekEvent>;
+        eventsByWeek: KnockoutComputed<Array<WeekEvent>>;
         
-        getEventsForDate(date: Date): DayEvent;
+        eventsForDate: KnockoutComputed<DayEvent>;
         
         weeksInDateRange(start: Date, end: Date): number;
         
@@ -50,6 +52,11 @@ declare module "ko-calendar" {
     interface DayEvent {
         date: Date;
         events: any[];
+    }
+    
+    interface Event {
+        __date: Date;
+        [key: string]: any;
     }
 
     interface DateRange {
