@@ -1,8 +1,8 @@
 var chai = require('chai');
 var KoCal = require('../ko-calendar');
-console.log(KoCal);
 var expect = chai.expect;
 var cal = new KoCal.Calendar();
+var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
 describe('equivalence tests', function () {
     it('will find two dates equivalent', function () {
         var first = new Date(2015, 1, 1, 1, 1, 1);
@@ -71,4 +71,40 @@ describe('floor and ceiling tests', function () {
         expect(ceil.getMilliseconds()).to.equal(999);
     });
 });
+describe('get events tests', function () {
+    addDate(); // Thu 1 Jan
+    addDate(1); // Fri 2 Jan
+    it('will find the date range', function () {
+        var extremes = cal.getDateRange();
+        var start = extremes.start;
+        var end = extremes.end;
+        expect(start.getDay()).to.equal(cal.startDay());
+        expect(end.getDay()).to.equal(cal.endDay());
+    });
+    it('will allocate events to their corresponding DayEvent', function () {
+        var events = cal.eventsByDay();
+        expect(events[0].events.length).to.equal(0);
+        expect(events[1].events.length).to.equal(0);
+        expect(events[2].events.length).to.equal(0);
+        expect(events[3].events.length).to.equal(0);
+        expect(events[4].events.length).to.equal(1);
+        expect(events[5].events.length).to.equal(1);
+        expect(events[6].events.length).to.equal(0);
+    });
+    it('will allocate the correct number of weeks', function () {
+        var events = cal.eventsByWeek();
+        expect(events.length).to.equal(1);
+    });
+    it('will allocate the correct week span', function () {
+        var events = cal.eventsByWeek();
+        expect(cal.isSameDate(events[0].start, new Date(2014, 11, 28))).to.be.true;
+        expect(cal.isSameDate(events[0].end, new Date(2015, 0, 3))).to.be.true;
+    });
+});
+function addDate(daysFromNow) {
+    daysFromNow = daysFromNow || 0;
+    var date = new Date(baseDate.getTime());
+    date.setDate(date.getDate() + daysFromNow);
+    cal.addEvent(date);
+}
 //# sourceMappingURL=index.js.map
