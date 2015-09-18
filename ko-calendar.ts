@@ -33,11 +33,16 @@ export class Calendar implements Types.Calendar {
     parser: Parser = (userObject: any) => {
         // Default behaviour
         // This should be overridden by the consumer
+        
         if (userObject instanceof Date) return new Date(userObject.getTime());
+        if (typeof userObject === 'string' || typeof userObject === 'number') {
+            var returnDate = new Date(<any>userObject);
+            if (!isNaN(returnDate.getTime())) return returnDate;
+        }
 
         var date = userObject.date;
 
-        if (date instanceof Date) return date;
+        if (date instanceof Date) return new Date(date.getTime());
 
         if (typeof date === 'string' || typeof date === 'number') {
             var returnDate = new Date(<any>date);
@@ -62,9 +67,13 @@ export class Calendar implements Types.Calendar {
 
     startDay = ko.observable(0);
 
-    endDay = ko.computed(() => this.startDay() + 6);
+    endDay = ko.computed(() => this.startDay() === 0 ? 6 : this.startDay() - 1);
 
     addEvent(userObject: any): void {
+        this.events.push(userObject);
+    }
+
+    addEvents(userObject: any[]): void {
         this.events.push(userObject);
     }
 
@@ -125,7 +134,7 @@ export class Calendar implements Types.Calendar {
 
             weekEvents.push(week);
         }
-        
+
         return weekEvents;
     });
 

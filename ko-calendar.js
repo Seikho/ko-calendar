@@ -14,9 +14,14 @@ var Calendar = (function () {
             // This should be overridden by the consumer
             if (userObject instanceof Date)
                 return new Date(userObject.getTime());
+            if (typeof userObject === 'string' || typeof userObject === 'number') {
+                var returnDate = new Date(userObject);
+                if (!isNaN(returnDate.getTime()))
+                    return returnDate;
+            }
             var date = userObject.date;
             if (date instanceof Date)
-                return date;
+                return new Date(date.getTime());
             if (typeof date === 'string' || typeof date === 'number') {
                 var returnDate = new Date(date);
                 if (!isNaN(returnDate.getTime()))
@@ -35,7 +40,7 @@ var Calendar = (function () {
             return _this.sortByDate(parsed);
         });
         this.startDay = ko.observable(0);
-        this.endDay = ko.computed(function () { return _this.startDay() + 6; });
+        this.endDay = ko.computed(function () { return _this.startDay() === 0 ? 6 : _this.startDay() - 1; });
         this.eventsForDate = ko.computed(function () {
             var forDate = _this.eventsDate();
             var events = _this.parsedEvents().filter(function (event) { return _this.isSameDate(forDate, event.date); });
@@ -95,6 +100,9 @@ var Calendar = (function () {
         this.parser = parser;
     }
     Calendar.prototype.addEvent = function (userObject) {
+        this.events.push(userObject);
+    };
+    Calendar.prototype.addEvents = function (userObject) {
         this.events.push(userObject);
     };
     Calendar.prototype.sortByDate = function (events) {
