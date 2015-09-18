@@ -4,6 +4,11 @@
 <head>
     <title>KoCalendar demo</title>
 </head>
+
+<body>
+    <h3>Ko-calendar test</h3>
+    <div id="target"></div>
+</body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js" type="text/javascript"></script>
 <script src="../ko-calendar.js" type="text/javascript"></script>
 
@@ -26,6 +31,15 @@
     
     calendar.addEvents(sampleDates);
     
-    console.log(calendar.eventsByDay());    
+    calendar.addEvents(sampleDates);
+    var events = calendar.eventsByDay();
+    var eventsToHtml = events.map(function(event) { 
+        return '<pre>' + JSON.stringify(event) + '</pre>'; 
+    });
+        
+        
+    document.getElementById('target').innerHTML = eventsToHtml.join(' ');
+
 </script>
+
 </html>
