@@ -2,3 +2,4 @@ test/
 .vscode
 tsd.json
 .git/
+example/
