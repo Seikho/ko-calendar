@@ -39,7 +39,12 @@ var Calendar = (function () {
             });
             return _this.sortByDate(parsed);
         });
-        this.startDay = ko.observable(0);
+        this.privateStartDay = ko.observable(0);
+        this.startDay = ko.pureComputed({
+            read: function () { return _this.privateStartDay(); },
+            write: function (dayOfWeek) { return _this.privateStartDay(Math.abs(dayOfWeek) % 7); },
+            owner: this
+        });
         this.endDay = ko.computed(function () { return _this.startDay() === 0 ? 6 : _this.startDay() - 1; });
         this.eventsForDate = ko.computed(function () {
             var forDate = _this.eventsDate();

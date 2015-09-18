@@ -65,7 +65,13 @@ export class Calendar implements Types.Calendar {
         return this.sortByDate(parsed);
     });
 
-    startDay = ko.observable(0);
+    privateStartDay = ko.observable(0);
+    
+    startDay = ko.pureComputed({
+        read: () => this.privateStartDay(),
+        write: (dayOfWeek: number) => this.privateStartDay(Math.abs(dayOfWeek) % 7),
+        owner: this
+    });
 
     endDay = ko.computed(() => this.startDay() === 0 ? 6 : this.startDay() - 1);
 
