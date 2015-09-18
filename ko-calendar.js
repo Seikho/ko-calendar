@@ -191,4 +191,3 @@ var Calendar = (function () {
 })();
 if (typeof exports !== 'undefined')
     module.exports.Calendar = Calendar;
-//# sourceMappingURL=ko-calendar.js.map

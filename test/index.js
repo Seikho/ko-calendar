@@ -146,4 +146,3 @@ function addDate(daysFromNow) {
     date.setDate(date.getDate() + daysFromNow);
     cal.addEvent(date);
 }
-//# sourceMappingURL=index.js.map
