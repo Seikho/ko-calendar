@@ -5,17 +5,22 @@ import DayEvent = Types.DayEvent;
 import DateRange = Types.DateRange;
 import Event = Types.Event;
 
-var ko;
+declare var ko;
 var requireExists = typeof window === 'undefined'
     ? typeof require === 'function'
     : typeof window['require'] === 'function';
 
-if (typeof ko === 'undefined' && !requireExists)
-    throw new Error("Unable to load knockout");
 
-ko = ko || typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
 
-export class Calendar implements Types.Calendar {
+if (typeof ko === 'undefined') {
+    if (!requireExists) {
+        throw new Error("Unable to load knockout");
+    }
+    
+    ko = typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
+}
+
+class Calendar implements Types.Calendar {
 
     constructor(parser?: Parser) {
         if (!parser) return;
@@ -66,7 +71,7 @@ export class Calendar implements Types.Calendar {
     });
 
     privateStartDay = ko.observable(0);
-    
+
     startDay = ko.pureComputed({
         read: () => this.privateStartDay(),
         write: (dayOfWeek: number) => this.privateStartDay(Math.abs(dayOfWeek) % 7),
@@ -236,3 +241,5 @@ export class Calendar implements Types.Calendar {
         return { start, end };
     }
 }
+
+if (typeof exports !== 'undefined') module.exports.Calendar = Calendar;

@@ -1,10 +1,12 @@
-var ko;
 var requireExists = typeof window === 'undefined'
     ? typeof require === 'function'
     : typeof window['require'] === 'function';
-if (typeof ko === 'undefined' && !requireExists)
-    throw new Error("Unable to load knockout");
-ko = ko || typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
+if (typeof ko === 'undefined') {
+    if (!requireExists) {
+        throw new Error("Unable to load knockout");
+    }
+    ko = typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
+}
 var Calendar = (function () {
     function Calendar(parser) {
         var _this = this;
@@ -185,5 +187,6 @@ var Calendar = (function () {
     };
     return Calendar;
 })();
-exports.Calendar = Calendar;
+if (typeof exports !== 'undefined')
+    module.exports.Calendar = Calendar;
 //# sourceMappingURL=ko-calendar.js.map
