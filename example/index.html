@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>KoCalendar demo</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js" type="text/javascript"></script>
+<script src="../ko-calendar.js" type="text/javascript"></script>
+
+<script>
+    function addDate(daysFromNow) {
+        daysFromNow = daysFromNow || 0;
+        var now = new Date();
+        now.setDate(now.getDate() + daysFromNow);
+        return now;
+    }
+    
+    var calendar = new Calendar();
+    var sampleDates = [
+        addDate(),
+        addDate(1),
+        addDate(2),
+        addDate(3),
+        addDate(4),
+    ];
+    
+    calendar.addEvents(sampleDates);
+    
+    console.log(calendar.eventsByDay());    
+</script>
+</html>
