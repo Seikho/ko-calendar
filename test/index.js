@@ -29,36 +29,26 @@ describe('floor and ceiling tests', function () {
     it('will floor a given date', function () {
         var now = new Date();
         var floor = cal.floorToDay(now);
-        expect(cal.isSameDate(now, floor)).to.be.true;
-        expect(floor.getHours()).to.equal(0);
-        expect(floor.getMinutes()).to.equal(0);
-        expect(floor.getSeconds()).to.equal(0);
+        var expected = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        expect(floor.toUTCString()).to.equal(expected.toUTCString());
     });
     it('will ceil a given date', function () {
         var now = new Date();
         var ceil = cal.ceilToDay(now);
-        expect(cal.isSameDate(now, ceil)).to.be.true;
-        expect(ceil.getHours()).to.equal(23);
-        expect(ceil.getMinutes()).to.equal(59);
-        expect(ceil.getSeconds()).to.equal(59);
-        expect(ceil.getMilliseconds()).to.equal(999);
+        var expected = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        expect(ceil.toUTCString()).to.equal(expected.toUTCString());
     });
     it('will ceil a date that has 00:00:00 time to 23:59:59.999 the same day', function () {
         var testDate = new Date(2015, 1, 1, 0, 0, 0);
         var ceil = cal.ceilToDay(testDate);
-        expect(ceil.getDate()).to.equal(1);
-        expect(ceil.getHours()).to.equal(23);
-        expect(ceil.getMinutes()).to.equal(59);
-        expect(ceil.getSeconds()).to.equal(59);
-        expect(ceil.getMilliseconds()).to.equal(999);
+        var expected = new Date(testDate.getFullYear(), testDate.getMonth(), testDate.getDate(), 23, 59, 59, 999);
+        expect(ceil.toUTCString()).to.equal(expected.toUTCString());
     });
     it('will floor a date to start of week', function () {
         var now = new Date(2015, 8, 16); // Wed 16 Sep 2015
         var floor = cal.floorToWeekStart(now);
-        var expected = new Date(2015, 8, 13); // Sun 13 Sep 2015
-        expect(cal.isSameDate(floor, expected)).to.be.true;
-        expect(floor.getHours()).to.equal(0);
-        expect(floor.getMinutes()).to.equal(0);
+        var expected = new Date(2015, 8, 13, 0, 0, 0); // Sun 13 Sep 2015
+        expect(floor.toUTCString()).to.equal(expected.toUTCString());
     });
     it('will ceil a date to end of week', function () {
         var now = new Date(2015, 8, 16); // Wed 16 Sep 2015 00:00:00
@@ -97,8 +87,21 @@ describe('get events tests', function () {
     });
     it('will allocate the correct week span', function () {
         var events = cal.eventsByWeek();
-        expect(cal.isSameDate(events[0].start, new Date(2014, 11, 28))).to.be.true;
-        expect(cal.isSameDate(events[0].end, new Date(2015, 0, 3))).to.be.true;
+        expect(events[0].start.toUTCString()).to.be.equal(new Date(2014, 11, 28).toUTCString());
+        expect(events[0].end.toUTCString()).to.be.equal(new Date(2015, 0, 3, 23, 59, 59, 999).toUTCString());
+    });
+    it('will add an additional week after adding more events', function () {
+        addDate(7);
+        var events = cal.eventsByWeek();
+        expect(events[0].start.toUTCString()).to.be.equal(new Date(2014, 11, 28).toUTCString());
+        expect(events[1].end.toUTCString()).to.be.equal(new Date(2015, 0, 10, 23, 59, 59, 999).toUTCString());
+        expect(events.length).to.equal(2);
+        expect(events[1].days[4].events.length).to.equal(1);
+    });
+    it('will allocate the correct week span for events across two weeks', function () {
+        var events = cal.eventsByDay();
+        expect(events[0].date.toUTCString()).to.equal(new Date(2014, 11, 28, 0, 0, 0).toUTCString());
+        expect(events.slice(-1)[0].date.toUTCString()).to.equal(new Date(2015, 0, 10, 0, 0, 0).toUTCString());
     });
 });
 function addDate(daysFromNow) {
