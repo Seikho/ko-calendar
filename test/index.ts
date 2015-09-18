@@ -67,8 +67,14 @@ describe('start/end day value tests', () => {
     
     it('will find endDay:5 when start:6', () => {
         cal.startDay(6);
-        expect(cal.endDay()).to.equal(0);
+        expect(cal.endDay()).to.equal(5);
     });
+    
+    it('will amend a value outside of 0-6 that is provided to startDay', () => {
+        cal.startDay(7);
+        expect(cal.startDay()).to.equal(0);
+        expect(cal.endDay()).to.equal(6);
+    })
 })
 
 describe('floor and ceiling tests', () => {

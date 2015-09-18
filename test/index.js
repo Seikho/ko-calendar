@@ -52,7 +52,12 @@ describe('start/end day value tests', function () {
     });
     it('will find endDay:5 when start:6', function () {
         cal.startDay(6);
-        expect(cal.endDay()).to.equal(0);
+        expect(cal.endDay()).to.equal(5);
+    });
+    it('will amend a value outside of 0-6 that is provided to startDay', function () {
+        cal.startDay(7);
+        expect(cal.startDay()).to.equal(0);
+        expect(cal.endDay()).to.equal(6);
     });
 });
 describe('floor and ceiling tests', function () {
