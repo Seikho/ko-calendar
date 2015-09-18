@@ -4,6 +4,10 @@
 <head>
     <title>KoCalendar demo</title>
 </head>
+<body>
+    <h3>Ko-calendar test</h3>
+    <div id="target"></div>
+</body>
 <script src="https://rawgit.com/requirejs/cajon/0.2.11/cajon.js"></script>
 <script>
     require.config({
@@ -35,8 +39,13 @@
         ];
         
         calendar.addEvents(sampleDates);
+        var events = calendar.eventsByDay();
+        var eventsToHtml = events.map(function(event) { 
+           return '<pre>' + JSON.stringify(event) + '</pre>'; 
+        });
         
-        console.log(calendar.eventsByDay());
+        
+        document.getElementById('target').innerHTML = eventsToHtml.join(' ');
     });
 
 
