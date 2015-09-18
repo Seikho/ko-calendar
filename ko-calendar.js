@@ -63,13 +63,13 @@ var Calendar = (function () {
             var events = _this.parsedEvents();
             var range = _this.getDateRange();
             var weekEvents = [];
-            var iterator = range.start;
+            var iterator = new Date(range.start.getTime());
             var weekNumber = 1;
             while (iterator < range.end) {
                 var currentDay = iterator;
                 var endOfWeek = _this.ceilToWeekEnd(iterator);
                 var week = {
-                    start: iterator,
+                    start: new Date(iterator.getTime()),
                     end: endOfWeek,
                     weekNumber: weekNumber,
                     days: []

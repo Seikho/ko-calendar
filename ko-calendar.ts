@@ -101,13 +101,13 @@ export class Calendar implements Types.Calendar {
         var range = this.getDateRange();
         var weekEvents: WeekEvent[] = [];
 
-        var iterator = range.start;
+        var iterator = new Date(range.start.getTime());
         var weekNumber = 1;
         while (iterator < range.end) {
             var currentDay = iterator;
             var endOfWeek = this.ceilToWeekEnd(iterator)
             var week: WeekEvent = {
-                start: iterator,
+                start: new Date(iterator.getTime()),
                 end: endOfWeek,
                 weekNumber,
                 days: []
