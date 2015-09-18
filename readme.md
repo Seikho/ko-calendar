@@ -6,8 +6,15 @@ An opinionated Knockout Calendar ViewModel in TypeScript
 
 ### Installation
 
-#####Browser:
+##### Browser:
 Make `ko-calendar.js` available to the client
+```html
+<script src='https://rawgit.com/seikho/ko-calendar/master/ko-calendar.js'></script>
+<script>
+    var calendar = new Calender();
+</script>
+    
+```
  
 ##### TypeScript:
 Type definitions are available in `src/typings/ko-calendar/ko-calendar.d.ts`.  
@@ -17,6 +24,11 @@ npm install ko-calendar --save
 ```
  
 ##### Usage
+
+**Examples**  
+[Without RequireJS/Cajon](http://rawgit.com/seikho/ko-calendar/master/example/index.html)  
+[With RequireJS/Cajon](http://rawgit.com/seikho/ko-calendar/master/example/require.html)  
+  
 *Basic usage:*  
 If your objects are `Date`, `string` that are valid date string, or `number` that are valid date values.  
 The default parser will also look for a `date` property on your object and check for the aforementioned conditions.  
