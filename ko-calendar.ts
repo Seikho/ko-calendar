@@ -84,8 +84,10 @@ class Calendar implements Types.Calendar {
         this.events.push(userObject);
     }
 
-    addEvents(userObject: any[]): void {
-        this.events.push(userObject);
+    addEvents(userObjects: any[]): void {
+        var events = this.events();
+        events = events.concat(userObjects);        
+        this.events(events);
     }
 
     eventsForDate: KnockoutComputed<DayEvent> = ko.computed((): DayEvent => {

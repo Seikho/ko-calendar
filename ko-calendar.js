@@ -109,8 +109,10 @@ var Calendar = (function () {
     Calendar.prototype.addEvent = function (userObject) {
         this.events.push(userObject);
     };
-    Calendar.prototype.addEvents = function (userObject) {
-        this.events.push(userObject);
+    Calendar.prototype.addEvents = function (userObjects) {
+        var events = this.events();
+        events = events.concat(userObjects);
+        this.events(events);
     };
     Calendar.prototype.sortByDate = function (events) {
         var newArray = events.slice();
