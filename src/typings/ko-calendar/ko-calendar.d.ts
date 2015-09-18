@@ -47,6 +47,8 @@ declare module "ko-calendar" {
     interface WeekEvent extends DateRange {
         weekNumber: number;
         days: Array<DayEvent>;
+        start: Date;
+        end: Date;
     }
 
     interface DayEvent {
