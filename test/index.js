@@ -25,6 +25,36 @@ describe('equivalence tests', function () {
         expect(cal.isSameWeek(first, second)).to.be.false;
     });
 });
+describe('start/end day value tests', function () {
+    it('will find endDay:6 when start:0', function () {
+        cal.startDay(0);
+        expect(cal.endDay()).to.equal(6);
+    });
+    it('will find endDay:0 when start:1', function () {
+        cal.startDay(1);
+        expect(cal.endDay()).to.equal(0);
+    });
+    it('will find endDay:1 when start:2', function () {
+        cal.startDay(2);
+        expect(cal.endDay()).to.equal(1);
+    });
+    it('will find endDay:2 when start:3', function () {
+        cal.startDay(3);
+        expect(cal.endDay()).to.equal(2);
+    });
+    it('will find endDay:3 when start:4', function () {
+        cal.startDay(4);
+        expect(cal.endDay()).to.equal(3);
+    });
+    it('will find endDay:4 when start:5', function () {
+        cal.startDay(5);
+        expect(cal.endDay()).to.equal(4);
+    });
+    it('will find endDay:5 when start:6', function () {
+        cal.startDay(6);
+        expect(cal.endDay()).to.equal(0);
+    });
+});
 describe('floor and ceiling tests', function () {
     it('will floor a given date', function () {
         var now = new Date();
@@ -39,6 +69,7 @@ describe('floor and ceiling tests', function () {
         expect(ceil.toUTCString()).to.equal(expected.toUTCString());
     });
     it('will ceil a date that has 00:00:00 time to 23:59:59.999 the same day', function () {
+        cal.startDay(0);
         var testDate = new Date(2015, 1, 1, 0, 0, 0);
         var ceil = cal.ceilToDay(testDate);
         var expected = new Date(testDate.getFullYear(), testDate.getMonth(), testDate.getDate(), 23, 59, 59, 999);
