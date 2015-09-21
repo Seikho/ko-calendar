@@ -16,7 +16,7 @@ if (typeof ko === 'undefined') {
     if (!requireExists) {
         throw new Error("Unable to load knockout");
     }
-    
+
     ko = typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
 }
 
@@ -39,20 +39,29 @@ class Calendar implements Types.Calendar {
         // Default behaviour
         // This should be overridden by the consumer
         
-        if (userObject instanceof Date) return new Date(userObject.getTime());
+        if (userObject.start instanceof Date && userObject.end instanceof Date)
+            return userObject;
+
+        var date: Date;
+
+        if (userObject instanceof Date)
+            date = userObject;
+
+
         if (typeof userObject === 'string' || typeof userObject === 'number') {
             var returnDate = new Date(<any>userObject);
-            if (!isNaN(returnDate.getTime())) return returnDate;
+            if (!isNaN(returnDate.getTime())) date = returnDate;
         }
 
-        var date = userObject.date;
-
-        if (date instanceof Date) return new Date(date.getTime());
+        if (userObject.date instanceof Date) date = new Date(userObject.date.getTime());
 
         if (typeof date === 'string' || typeof date === 'number') {
             var returnDate = new Date(<any>date);
-            if (!isNaN(returnDate.getTime())) return returnDate;
+            if (!isNaN(returnDate.getTime())) date = returnDate;
         }
+
+        if (date instanceof Date)
+            return { start: new Date(date.getTime()), end: date };
 
         throw new Error(`Invalid object parsed [${JSON.stringify(userObject) }]`);
     }
@@ -60,14 +69,16 @@ class Calendar implements Types.Calendar {
     events: KnockoutObservableArray<any> = ko.observableArray([]);
 
     parsedEvents: KnockoutComputed<Array<Event>> = ko.computed((): Array<Event> => {
-        var parsed: Event[] = this.events().map(userObject => {
+        var parsedObjects: Event[] = this.events().map(userObject => {
+            var parsed = this.parser(userObject);
             return {
-                date: this.parser(userObject),
+                start: parsed.start,
+                end: parsed.end,
                 value: userObject
             };
         });
 
-        return this.sortByDate(parsed);
+        return this.sortByDate(parsedObjects);
     });
 
     privateStartDay = ko.observable(0);
@@ -86,13 +97,13 @@ class Calendar implements Types.Calendar {
 
     addEvents(userObjects: any[]): void {
         var events = this.events();
-        events = events.concat(userObjects);        
+        events = events.concat(userObjects);
         this.events(events);
     }
 
     eventsForDate: KnockoutComputed<DayEvent> = ko.computed((): DayEvent => {
         var forDate = this.eventsDate();
-        var events = this.parsedEvents().filter(event => this.isSameDate(forDate, event.date));
+        var events = this.parsedEvents().filter(event => this.isInRange(forDate, event));
 
         return {
             date: this.floorToDay(forDate),
@@ -107,7 +118,7 @@ class Calendar implements Types.Calendar {
 
         var iterator = new Date(range.start.getTime());
         while (iterator < range.end) {
-            var currentEvents = events.filter(event => this.isSameDate(iterator, event.date));
+            var currentEvents = events.filter(event => this.isInRange(iterator, event));
             dayEvents.push({
                 date: new Date(iterator.getTime()),
                 events: currentEvents
@@ -136,7 +147,7 @@ class Calendar implements Types.Calendar {
             };
 
             while (currentDay < endOfWeek) {
-                var dayEvents = events.filter(event => this.isSameDate(currentDay, event.date));
+                var dayEvents = events.filter(event => this.isInRange(currentDay, event));
                 week.days.push({
                     date: currentDay,
                     events: dayEvents
@@ -154,7 +165,7 @@ class Calendar implements Types.Calendar {
     sortByDate(events: Array<Event>) {
         var newArray = events.slice();
 
-        return newArray.sort((left, right) => left.date > right.date ? 1 : -1);
+        return newArray.sort((left, right) => left.start > right.start ? 1 : -1);
     }
 
     weeksInDateRange(start: Date, end: Date) {
@@ -186,6 +197,14 @@ class Calendar implements Types.Calendar {
         var leftCeil = this.ceilToWeekEnd(left);
 
         return right >= leftFloor && right <= leftCeil;
+    }
+    
+    isInRange(date: Date, range: DateRange): boolean {
+        var sameAsStart = this.isSameDate(date, range.start);
+        var sameAsEnd = this.isSameDate(date, range.end);
+        var isInRange = date >= range.start && date <= range.end;
+        
+        return sameAsStart || sameAsEnd || isInRange;
     }
 
     floorToDay(date: Date) {
@@ -229,8 +248,8 @@ class Calendar implements Types.Calendar {
         var start, end;
 
         events.forEach(event => {
-            if (start == null || event.date < start) start = new Date(event.date.getTime());
-            if (end == null || event.date > end) end = new Date(event.date.getTime());
+            if (start == null || event.start < start) start = new Date(event.start.getTime());
+            if (end == null || event.end > end) end = new Date(event.end.getTime());
         });
 
         if (start == null) start = new Date();

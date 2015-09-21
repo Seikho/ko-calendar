@@ -14,32 +14,38 @@ var Calendar = (function () {
         this.parser = function (userObject) {
             // Default behaviour
             // This should be overridden by the consumer
+            if (userObject.start instanceof Date && userObject.end instanceof Date)
+                return userObject;
+            var date;
             if (userObject instanceof Date)
-                return new Date(userObject.getTime());
+                date = userObject;
             if (typeof userObject === 'string' || typeof userObject === 'number') {
                 var returnDate = new Date(userObject);
                 if (!isNaN(returnDate.getTime()))
-                    return returnDate;
+                    date = returnDate;
             }
-            var date = userObject.date;
-            if (date instanceof Date)
-                return new Date(date.getTime());
+            if (userObject.date instanceof Date)
+                date = new Date(userObject.date.getTime());
             if (typeof date === 'string' || typeof date === 'number') {
                 var returnDate = new Date(date);
                 if (!isNaN(returnDate.getTime()))
-                    return returnDate;
+                    date = returnDate;
             }
+            if (date instanceof Date)
+                return { start: new Date(date.getTime()), end: date };
             throw new Error("Invalid object parsed [" + JSON.stringify(userObject) + "]");
         };
         this.events = ko.observableArray([]);
         this.parsedEvents = ko.computed(function () {
-            var parsed = _this.events().map(function (userObject) {
+            var parsedObjects = _this.events().map(function (userObject) {
+                var parsed = _this.parser(userObject);
                 return {
-                    date: _this.parser(userObject),
+                    start: parsed.start,
+                    end: parsed.end,
                     value: userObject
                 };
             });
-            return _this.sortByDate(parsed);
+            return _this.sortByDate(parsedObjects);
         });
         this.privateStartDay = ko.observable(0);
         this.startDay = ko.pureComputed({
@@ -50,7 +56,7 @@ var Calendar = (function () {
         this.endDay = ko.computed(function () { return _this.startDay() === 0 ? 6 : _this.startDay() - 1; });
         this.eventsForDate = ko.computed(function () {
             var forDate = _this.eventsDate();
-            var events = _this.parsedEvents().filter(function (event) { return _this.isSameDate(forDate, event.date); });
+            var events = _this.parsedEvents().filter(function (event) { return _this.isInRange(forDate, event); });
             return {
                 date: _this.floorToDay(forDate),
                 events: events
@@ -62,7 +68,7 @@ var Calendar = (function () {
             var dayEvents = [];
             var iterator = new Date(range.start.getTime());
             while (iterator < range.end) {
-                var currentEvents = events.filter(function (event) { return _this.isSameDate(iterator, event.date); });
+                var currentEvents = events.filter(function (event) { return _this.isInRange(iterator, event); });
                 dayEvents.push({
                     date: new Date(iterator.getTime()),
                     events: currentEvents
@@ -87,7 +93,7 @@ var Calendar = (function () {
                     days: []
                 };
                 while (currentDay < endOfWeek) {
-                    var dayEvents = events.filter(function (event) { return _this.isSameDate(currentDay, event.date); });
+                    var dayEvents = events.filter(function (event) { return _this.isInRange(currentDay, event); });
                     week.days.push({
                         date: currentDay,
                         events: dayEvents
@@ -116,7 +122,7 @@ var Calendar = (function () {
     };
     Calendar.prototype.sortByDate = function (events) {
         var newArray = events.slice();
-        return newArray.sort(function (left, right) { return left.date > right.date ? 1 : -1; });
+        return newArray.sort(function (left, right) { return left.start > right.start ? 1 : -1; });
     };
     Calendar.prototype.weeksInDateRange = function (start, end) {
         var weeks = 0;
@@ -142,6 +148,12 @@ var Calendar = (function () {
         var leftFloor = this.floorToWeekStart(left);
         var leftCeil = this.ceilToWeekEnd(left);
         return right >= leftFloor && right <= leftCeil;
+    };
+    Calendar.prototype.isInRange = function (date, range) {
+        var sameAsStart = this.isSameDate(date, range.start);
+        var sameAsEnd = this.isSameDate(date, range.end);
+        var isInRange = date >= range.start && date <= range.end;
+        return sameAsStart || sameAsEnd || isInRange;
     };
     Calendar.prototype.floorToDay = function (date) {
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -173,10 +185,10 @@ var Calendar = (function () {
         var events = this.parsedEvents();
         var start, end;
         events.forEach(function (event) {
-            if (start == null || event.date < start)
-                start = new Date(event.date.getTime());
-            if (end == null || event.date > end)
-                end = new Date(event.date.getTime());
+            if (start == null || event.start < start)
+                start = new Date(event.start.getTime());
+            if (end == null || event.end > end)
+                end = new Date(event.end.getTime());
         });
         if (start == null)
             start = new Date();
