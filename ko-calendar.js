@@ -18,7 +18,7 @@ var Calendar = (function () {
                 return userObject;
             var date;
             if (userObject instanceof Date)
-                date = userObject;
+                date = new Date(userObject.getTime());
             if (typeof userObject === 'string' || typeof userObject === 'number') {
                 var returnDate = new Date(userObject);
                 if (!isNaN(returnDate.getTime()))
@@ -38,7 +38,8 @@ var Calendar = (function () {
         this.events = ko.observableArray([]);
         this.parsedEvents = ko.computed(function () {
             var parsedObjects = _this.events().map(function (userObject) {
-                var parsed = _this.parser(userObject);
+                var rawParsed = _this.parser(userObject);
+                var parsed = _this.parsedObjectToDateRange(rawParsed);
                 return {
                     start: parsed.start,
                     end: parsed.end,
@@ -112,6 +113,18 @@ var Calendar = (function () {
         }
         this.parser = parser;
     }
+    /**
+     * Handle the case where a user provided Parser returns a Date, not a DateRange
+     */
+    Calendar.prototype.parsedObjectToDateRange = function (parsedObject) {
+        if (parsedObject instanceof Date) {
+            return {
+                start: new Date(parsedObject.getTime()),
+                end: new Date(parsedObject.getTime())
+            };
+        }
+        return parsedObject;
+    };
     Calendar.prototype.addEvent = function (userObject) {
         this.events.push(userObject);
     };

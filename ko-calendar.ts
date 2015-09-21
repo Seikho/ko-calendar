@@ -45,7 +45,7 @@ class Calendar implements Types.Calendar {
         var date: Date;
 
         if (userObject instanceof Date)
-            date = userObject;
+            date = new Date(userObject.getTime());
 
 
         if (typeof userObject === 'string' || typeof userObject === 'number') {
@@ -65,12 +65,27 @@ class Calendar implements Types.Calendar {
 
         throw new Error(`Invalid object parsed [${JSON.stringify(userObject) }]`);
     }
+    
+    /**
+     * Handle the case where a user provided Parser returns a Date, not a DateRange
+     */
+    parsedObjectToDateRange(parsedObject: Date|DateRange): DateRange {
+        if (parsedObject instanceof Date) {
+            return {
+                start: new Date(parsedObject.getTime()),
+                end: new Date(parsedObject.getTime())
+            };
+        }
+        return <DateRange>parsedObject;
+    }
 
     events: KnockoutObservableArray<any> = ko.observableArray([]);
 
     parsedEvents: KnockoutComputed<Array<Event>> = ko.computed((): Array<Event> => {
         var parsedObjects: Event[] = this.events().map(userObject => {
-            var parsed = this.parser(userObject);
+            var rawParsed = this.parser(userObject);
+            var parsed = this.parsedObjectToDateRange(rawParsed);
+            
             return {
                 start: parsed.start,
                 end: parsed.end,
