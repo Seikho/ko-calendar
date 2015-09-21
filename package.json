@@ -1,6 +1,6 @@
 {
   "name": "ko-calendar",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Knockout Calendar API",
   "main": "ko-calendar.js",
   "scripts": {
@@ -31,6 +31,5 @@
     "knockout": "^3.3.0"
   },
   "dependencies": {
-  },
-  "typings": "src/typings/ko-calendar/ko-calendar.d.ts"
+  }
 }
