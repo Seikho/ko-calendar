@@ -32,6 +32,30 @@ describe('equivalence tests', () => {
         expect(cal.isSameWeek(first, second)).to.be.false;
     });
 
+    it('will find that a date is in range of a DateRange', () => {
+        var range = {
+            start: getDate(),
+            end: getDate(3)
+        };
+        expect(cal.isInRange(getDate(), range)).to.be.true;
+        expect(cal.isInRange(getDate(1), range)).to.be.true;
+        expect(cal.isInRange(getDate(2), range)).to.be.true;
+        expect(cal.isInRange(getDate(3), range)).to.be.true;
+    });
+
+    it('will find that a date is not in range of a DateRange', () => {
+        var range = {
+            start: getDate(),
+            end: getDate(3)
+        };
+        range.end.setSeconds(range.end.getSeconds() - 1);
+
+        var justBefore = new Date(getDate().setSeconds(getDate().getSeconds() - 1));
+        var justAfter = new Date(getDate(3).setSeconds(getDate(3).getSeconds() + 1));
+        expect(cal.isInRange(justBefore, range)).to.be.false;
+        expect(cal.isInRange(justAfter, range)).to.be.false;
+    });
+
 });
 
 describe('start/end day value tests', () => {
@@ -39,37 +63,37 @@ describe('start/end day value tests', () => {
         cal.startDay(0);
         expect(cal.endDay()).to.equal(6);
     });
-    
+
     it('will find endDay:0 when start:1', () => {
         cal.startDay(1);
         expect(cal.endDay()).to.equal(0);
     });
-    
+
     it('will find endDay:1 when start:2', () => {
         cal.startDay(2);
         expect(cal.endDay()).to.equal(1);
     });
-    
+
     it('will find endDay:2 when start:3', () => {
         cal.startDay(3);
         expect(cal.endDay()).to.equal(2);
     });
-    
+
     it('will find endDay:3 when start:4', () => {
         cal.startDay(4);
         expect(cal.endDay()).to.equal(3);
     });
-    
+
     it('will find endDay:4 when start:5', () => {
         cal.startDay(5);
         expect(cal.endDay()).to.equal(4);
     });
-    
+
     it('will find endDay:5 when start:6', () => {
         cal.startDay(6);
         expect(cal.endDay()).to.equal(5);
     });
-    
+
     it('will amend a value outside of 0-6 that is provided to startDay', () => {
         cal.startDay(7);
         expect(cal.startDay()).to.equal(0);
@@ -176,9 +200,13 @@ describe('get events tests', () => {
 });
 
 function addDate(daysFromNow?: number) {
+    cal.addEvent(getDate(daysFromNow));
+}
+
+function getDate(daysFromNow?: number) {
     daysFromNow = daysFromNow || 0;
     var date = new Date(baseDate.getTime());
 
     date.setDate(date.getDate() + daysFromNow);
-    cal.addEvent(date);
+    return date;
 }

@@ -24,6 +24,27 @@ describe('equivalence tests', function () {
         var second = new Date(2015, 8, 20, 0, 0, 0); // Sun 20 Sep 2015 00:00:00
         expect(cal.isSameWeek(first, second)).to.be.false;
     });
+    it('will find that a date is in range of a DateRange', function () {
+        var range = {
+            start: getDate(),
+            end: getDate(3)
+        };
+        expect(cal.isInRange(getDate(), range)).to.be.true;
+        expect(cal.isInRange(getDate(1), range)).to.be.true;
+        expect(cal.isInRange(getDate(2), range)).to.be.true;
+        expect(cal.isInRange(getDate(3), range)).to.be.true;
+    });
+    it('will find that a date is not in range of a DateRange', function () {
+        var range = {
+            start: getDate(),
+            end: getDate(3)
+        };
+        range.end.setSeconds(range.end.getSeconds() - 1);
+        var justBefore = new Date(getDate().setSeconds(getDate().getSeconds() - 1));
+        var justAfter = new Date(getDate(3).setSeconds(getDate(3).getSeconds() + 1));
+        expect(cal.isInRange(justBefore, range)).to.be.false;
+        expect(cal.isInRange(justAfter, range)).to.be.false;
+    });
 });
 describe('start/end day value tests', function () {
     it('will find endDay:6 when start:0', function () {
@@ -141,8 +162,11 @@ describe('get events tests', function () {
     });
 });
 function addDate(daysFromNow) {
+    cal.addEvent(getDate(daysFromNow));
+}
+function getDate(daysFromNow) {
     daysFromNow = daysFromNow || 0;
     var date = new Date(baseDate.getTime());
     date.setDate(date.getDate() + daysFromNow);
-    cal.addEvent(date);
+    return date;
 }
