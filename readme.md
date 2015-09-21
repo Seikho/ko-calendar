@@ -1,6 +1,9 @@
 ### ko-calendar
 An opinionated Knockout Calendar ViewModel in TypeScript
 
+[![NPM version](http://img.shields.io/npm/v/ko-calendar.svg?style=flat)](https://www.npmjs.org/package/ko-calendar)
+[![Travis build status](http://img.shields.io/travis/Seikho/ko-calendar/master.svg?style=flat)](https://travis-ci.org/Seikho/ko-calendar)
+
 ### Requirements
 `Knockout` (`ko` object) should be globally available or accessible via `require('knockout')`
 
