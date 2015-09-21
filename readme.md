@@ -30,23 +30,35 @@ npm install ko-calendar --save
 [With RequireJS/Cajon](http://rawgit.com/seikho/ko-calendar/master/example/require.html)  
   
 *Basic usage:*  
-If your objects are `Date`, `string` that are valid date string, or `number` that are valid date values.  
-The default parser will also look for a `date` property on your object and check for the aforementioned conditions.  
+If your objects are [DateRange](#daterange) object, `Date`, `string` that are valid date string, or `number` that are valid date values:  
+then the default parser will correctly parse these objects.
+  
 ```javascript
-var KoCal = require('ko-calendar');
-var calendar = new KoCal.Calendar();
+var Calendar = require('ko-calendar').Calendar;
+var calendar = new Calendar();
 ```
 
 
 *Better usage:*  
 If you have more complex objects that might resemble something like `{ date: ..., id: ..., eventName: ... }`
-You will need to provide a function to `ko-calendar` to tell it how to extract the date from your custom objects.  
+You will need to provide a function to `ko-calendar` to tell it how to extract the `Date` or [DateRange](#daterange) from your custom objects.  
 
 ```javascript
-var KoCal = require('ko-calendar');
+var Calendar = require('ko-calendar').Calendar;
+//or
+import { Calendar } from 'ko-calendar';
 
+// Return a single date
 var calParser = function(myObject) {
     return myObject.date;
+}
+
+//Return a date range
+var calParser = function(myObject) {
+    return {
+        start: new Date(myObject.startDate),
+        end: new Date(myObject.endDate)
+    }
 }
 var calendar = new KoCal.Calendar(calParser);
 ```
@@ -91,6 +103,13 @@ var events = calendar.eventsByDay();
 *Returns Array<[WeekEvent](#weekevent)> object*
 ```javascript
 var events = calendar.eventsByWeek();
+```
+#### DateRange
+```javascript
+interface {
+    start: Date;
+    end: Date;
+}
 ```
 
 #### Event
