@@ -149,9 +149,10 @@ describe('floor and ceiling tests', () => {
 });
 
 describe('get events tests', () => {
-    addDate(); // Thu 1 Jan
-    addDate(1); // Fri 2 Jan
-    
+    addRange(0); // Thu 1 Jan
+    addRange(1); // Fri 2 Jan
+    addRange(-1, 2);
+
     it('will find the date range', () => {
         var extremes = cal.getDateRange();
         var start = extremes.start;
@@ -166,10 +167,10 @@ describe('get events tests', () => {
         expect(events[0].events.length).to.equal(0);
         expect(events[1].events.length).to.equal(0);
         expect(events[2].events.length).to.equal(0);
-        expect(events[3].events.length).to.equal(0);
-        expect(events[4].events.length).to.equal(1);
-        expect(events[5].events.length).to.equal(1);
-        expect(events[6].events.length).to.equal(0);
+        expect(events[3].events.length).to.equal(1);
+        expect(events[4].events.length).to.equal(2);
+        expect(events[5].events.length).to.equal(2);
+        expect(events[6].events.length).to.equal(1);
     });
 
     it('will allocate the correct number of weeks', () => {
@@ -201,6 +202,14 @@ describe('get events tests', () => {
 
 function addDate(daysFromNow?: number) {
     cal.addEvent(getDate(daysFromNow));
+}
+
+function addRange(startDaysFromNow: number, endDaysFromNow?: number) {
+    endDaysFromNow = endDaysFromNow || startDaysFromNow;
+    var start = getDate(startDaysFromNow);
+    var end = getDate(endDaysFromNow);
+
+    cal.addEvent({ start, end });
 }
 
 function getDate(daysFromNow?: number) {
