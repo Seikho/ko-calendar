@@ -1,9 +1,4 @@
-import Types = require("ko-calendar");
-import Parser = Types.Parser;
-import WeekEvent = Types.WeekEvent;
-import DayEvent = Types.DayEvent;
-import DateRange = Types.DateRange;
-import Event = Types.Event;
+import { Calendar as Base, Parser, DayEvent, WeekEvent, DateRange, CalendarEvent as Event } from './index';
 
 declare var ko;
 var requireExists = typeof window === 'undefined'
@@ -20,7 +15,7 @@ if (typeof ko === 'undefined') {
     ko = typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
 }
 
-class Calendar implements Types.Calendar {
+class Calendar implements Base {
 
     constructor(parser?: Parser) {
         if (!parser) return;
