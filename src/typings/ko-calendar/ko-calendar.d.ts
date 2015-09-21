@@ -57,7 +57,8 @@ declare module "ko-calendar" {
     }
 
     interface Event {
-        date: Date;
+        start: Date;
+        end: Date;
         value: any;
     }
 
