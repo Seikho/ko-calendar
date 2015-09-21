@@ -28,6 +28,8 @@ declare module "ko-calendar" {
         isSameDate(left: Date, right: Date): boolean;
 
         isSameWeek(left: Date, right: Date): boolean;
+        
+        isInRange(date: Date, range: DateRange): boolean;
 
         floorToDay(date: Date): Date;
 
