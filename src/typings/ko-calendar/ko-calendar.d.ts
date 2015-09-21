@@ -41,7 +41,7 @@ declare module "ko-calendar" {
     }
 
     interface Parser {
-        (userObject: any): Date;
+        (userObject: any): DateRange;
     }
 
     interface WeekEvent extends DateRange {
