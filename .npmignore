@@ -3,3 +3,4 @@ test/
 tsd.json
 .git/
 example/
+.travis.yml
