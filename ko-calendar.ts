@@ -1,4 +1,10 @@
-import { Calendar as Base, Parser, DayEvent, WeekEvent, DateRange, CalendarEvent as Event } from './index';
+import * as Types from './index';
+import Parser = Types.Parser;
+import WeekEvent = Types.WeekEvent;
+import DayEvent = Types.DayEvent;
+import BaseCalendar = Types.Calendar;
+import CalendarEvent = Types.CalendarEvent;
+import DateRange = Types.DateRange;
 
 declare var ko;
 var requireExists = typeof window === 'undefined'
@@ -15,7 +21,7 @@ if (typeof ko === 'undefined') {
     ko = typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
 }
 
-class Calendar implements Base {
+class Calendar implements BaseCalendar {
 
     constructor(parser?: Parser) {
         if (!parser) return;
@@ -76,8 +82,8 @@ class Calendar implements Base {
 
     events: KnockoutObservableArray<any> = ko.observableArray([]);
 
-    parsedEvents: KnockoutComputed<Array<Event>> = ko.computed((): Array<Event> => {
-        var parsedObjects: Event[] = this.events().map(userObject => {
+    parsedEvents: KnockoutComputed<Array<CalendarEvent>> = ko.computed((): Array<CalendarEvent> => {
+        var parsedObjects: CalendarEvent[] = this.events().map(userObject => {
             var rawParsed = this.parser(userObject);
             var parsed = this.parsedObjectToDateRange(rawParsed);
             
@@ -172,7 +178,7 @@ class Calendar implements Base {
         return weekEvents;
     });
 
-    sortByDate(events: Array<Event>) {
+    sortByDate(events: Array<CalendarEvent>) {
         var newArray = events.slice();
 
         return newArray.sort((left, right) => left.start > right.start ? 1 : -1);
@@ -273,4 +279,4 @@ class Calendar implements Base {
     }
 }
 
-if (typeof exports !== 'undefined') module.exports.Calendar = Calendar;
+if (typeof exports !== 'undefined') module.exports = Calendar;
