@@ -1,8 +1,8 @@
 import chai = require('chai');
 import * as Types from '../index';
-var KoCal = require('../ko-calendar');
+var KoCalendar = require('../ko-calendar');
 var expect = chai.expect;
-var cal: Types.Calendar = new KoCal.Calendar();
+var cal: Types.Calendar = new KoCalendar.Calendar();
 
 var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
 

@@ -1,7 +1,7 @@
 var chai = require('chai');
-var KoCal = require('../ko-calendar');
+var KoCalendar = require('../ko-calendar');
 var expect = chai.expect;
-var cal = new KoCal.Calendar();
+var cal = new KoCalendar.Calendar();
 var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
 describe('equivalence tests', function () {
     it('will find two dates equivalent', function () {
