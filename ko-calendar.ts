@@ -279,4 +279,7 @@ class Calendar implements BaseCalendar {
     }
 }
 
-if (typeof exports !== 'undefined') module.exports = Calendar;
+if (typeof exports !== 'undefined') {
+    module.exports = Calendar;
+    module.exports.default = Calendar;
+}

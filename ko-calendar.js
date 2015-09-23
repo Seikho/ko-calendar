@@ -214,5 +214,7 @@ var Calendar = (function () {
     };
     return Calendar;
 })();
-if (typeof exports !== 'undefined')
+if (typeof exports !== 'undefined') {
     module.exports = Calendar;
+    module.exports.default = Calendar;
+}
