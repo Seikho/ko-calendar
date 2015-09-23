@@ -35,7 +35,7 @@ export class Calendar {
 
     ceilToWeekEnd(date: Date): Date;
 
-    getDateRange(): DateRange;
+    getDateRange(): DateRange;    
 }
 
 export interface Parser {
@@ -64,3 +64,5 @@ export interface DateRange {
     start: Date;
     end: Date;
 }
+
+export { Calendar as default } 
