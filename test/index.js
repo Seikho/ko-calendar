@@ -46,6 +46,19 @@ describe('equivalence tests', function () {
         expect(cal.isInRange(justAfter, range)).to.be.false;
     });
 });
+describe('ordered days of week tests', function () {
+    it('will calculate the ordered days of the week with no data provided', function () {
+        var weekDays = cal.weekDays();
+        expect(weekDays[0]).to.equal('Sun');
+        expect(weekDays[6]).to.equal('Sat');
+    });
+    it('will calculate the ordered days of the week with an altered start day', function () {
+        cal.startDay(4);
+        var weekDays = cal.weekDays();
+        expect(weekDays[0]).to.equal('Thu');
+        expect(weekDays[6]).to.equal('Wed');
+    });
+});
 describe('start/end day value tests', function () {
     it('will find endDay:6 when start:0', function () {
         cal.startDay(0);
