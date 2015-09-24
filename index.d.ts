@@ -18,6 +18,8 @@ export class Calendar {
     eventsByWeek: KnockoutComputed<Array<WeekEvent>>;
 
     eventsForDate: KnockoutComputed<DayEvent>;
+    
+    weekDays: KnockoutComputed<string[]>;
 
     weeksInDateRange(start: Date, end: Date): number;
 

@@ -70,7 +70,7 @@ class Calendar implements BaseCalendar {
     /**
      * Handle the case where a user provided Parser returns a Date, not a DateRange
      */
-    parsedObjectToDateRange(parsedObject: Date|DateRange): DateRange {
+    parsedObjectToDateRange(parsedObject: Date | DateRange): DateRange {
         if (parsedObject instanceof Date) {
             return {
                 start: new Date(parsedObject.getTime()),
@@ -86,7 +86,7 @@ class Calendar implements BaseCalendar {
         var parsedObjects: CalendarEvent[] = this.events().map(userObject => {
             var rawParsed = this.parser(userObject);
             var parsed = this.parsedObjectToDateRange(rawParsed);
-            
+
             return {
                 start: parsed.start,
                 end: parsed.end,
@@ -103,7 +103,7 @@ class Calendar implements BaseCalendar {
         read: () => this.privateStartDay(),
         write: (dayOfWeek: number) => this.privateStartDay(Math.abs(dayOfWeek) % 7),
         owner: this
-    });        
+    });
 
     endDay = ko.computed(() => this.startDay() === 0 ? 6 : this.startDay() - 1);
 
@@ -177,10 +177,10 @@ class Calendar implements BaseCalendar {
 
         return weekEvents;
     });
-    
+
     weekDays = ko.computed(() => {
-        var days = this.eventsByDay().slice(0,7);
-       return days.map(day => day.date.toString().slice(0,3)); 
+        var days = this.eventsByDay().slice(0, 7);
+        return days.map(day => day.date.toString().slice(0, 3));
     });
 
     sortByDate(events: Array<CalendarEvent>) {
@@ -219,12 +219,12 @@ class Calendar implements BaseCalendar {
 
         return right >= leftFloor && right <= leftCeil;
     }
-    
+
     isInRange(date: Date, range: DateRange): boolean {
         var sameAsStart = this.isSameDate(date, range.start);
         var sameAsEnd = this.isSameDate(date, range.end);
         var isInRange = date >= range.start && date <= range.end;
-        
+
         return sameAsStart || sameAsEnd || isInRange;
     }
 
