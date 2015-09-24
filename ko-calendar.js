@@ -105,6 +105,10 @@ var Calendar = (function () {
             }
             return weekEvents;
         });
+        this.weekDays = ko.computed(function () {
+            var days = _this.eventsByDay().slice(0, 7);
+            return days.map(function (day) { return day.date.toString().slice(0, 3); });
+        });
         if (!parser)
             return;
         if (typeof parser !== 'function') {

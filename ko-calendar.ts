@@ -103,7 +103,7 @@ class Calendar implements BaseCalendar {
         read: () => this.privateStartDay(),
         write: (dayOfWeek: number) => this.privateStartDay(Math.abs(dayOfWeek) % 7),
         owner: this
-    });
+    });        
 
     endDay = ko.computed(() => this.startDay() === 0 ? 6 : this.startDay() - 1);
 
@@ -176,6 +176,11 @@ class Calendar implements BaseCalendar {
         }
 
         return weekEvents;
+    });
+    
+    weekDays = ko.computed(() => {
+        var days = this.eventsByDay().slice(0,7);
+       return days.map(day => day.date.toString().slice(0,3)); 
     });
 
     sortByDate(events: Array<CalendarEvent>) {
