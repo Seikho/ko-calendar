@@ -44,11 +44,14 @@ export interface Parser {
     (userObject: any): DateRange;
 }
 
+export interface MonthEvent extends DateRange {
+    monthNumber: number;
+    weeks: Array<WeekEvent>;
+}
+
 export interface WeekEvent extends DateRange {
     weekNumber: number;
     days: Array<DayEvent>;
-    start: Date;
-    end: Date;
 }
 
 export interface DayEvent {
