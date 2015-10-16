@@ -1,6 +1,6 @@
 import chai = require('chai');
 import * as Types from '../index';
-var KoCalendar = require('../ko-calendar');
+var KoCalendar = require('../src/ko-calendar');
 var expect = chai.expect;
 var cal: Types.Calendar = new KoCalendar();
 
