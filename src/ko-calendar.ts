@@ -10,14 +10,20 @@ import DE = require('date-equality');
 
 export = Calendar;
 
+declare var ko: any;
+if (typeof ko === 'undefined') {
+    if (typeof require === 'undefined') throw new Error('Knockout is required to use Ko-Calendar');
+    try {
+        ko = require('knockout');
+    } catch (ex) {
+        throw new Error('Knockout is required to use Ko-Calendar');
+    }
+}
 
 class Calendar implements BaseCalendar {
 
     constructor(parser?: Parser) {
-        this.privateStartDay.subscribe(day => {
-           DE.startOfWeek(day); 
-        });
-        
+
         if (!parser) return;
 
         if (typeof parser !== 'function') {
@@ -95,11 +101,13 @@ class Calendar implements BaseCalendar {
 
     startDay = ko.pureComputed({
         read: () => this.privateStartDay(),
-        write: (dayOfWeek: number) => this.privateStartDay(Math.abs(dayOfWeek) % 7),
+        write: (dayOfWeek: number) => {
+            this.privateStartDay(DE.startDay(dayOfWeek))
+        },
         owner: this
     });
 
-    endDay = ko.computed(() => this.startDay() === 0 ? 6 : this.startDay() - 1);
+    endDay = ko.computed(() => DE.endDay(this.privateStartDay()));
 
     addEvent(userObject: any): void {
         this.events.push(userObject);
@@ -171,13 +179,20 @@ class Calendar implements BaseCalendar {
 
         return weekEvents;
     });
+    currentMonth: KnockoutObservable<{ year: number, month: number }> = ko.observable({ year: 0, month: 0 });
 
     eventsForMonth: KnockoutComputed<MonthEvent> = ko.computed(() => {
         var weeks = this.eventsByWeek();
         var current = this.currentMonth();
         var isMonth = (date: Date) => date.getFullYear() === current.year && date.getMonth() === current.month;
 
-        return weeks.filter(week => isMonth(week.start) || isMonth(week.end));
+        var weeks = weeks.filter(week => isMonth(week.start) || isMonth(week.end));
+
+        return {
+            weeks,
+            start: null,
+            end: null
+        }
     });
 
     previousMonth = () => { }
@@ -189,7 +204,6 @@ class Calendar implements BaseCalendar {
         return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
     }
 
-    currentMonth: KnockoutObservable<{ year: number, month: number }> = ko.observable({ year: 0, month: 0 });
 
     weekDays = ko.computed(() => {
         var days = this.eventsByDay().slice(0, 7);
@@ -235,16 +249,17 @@ class Calendar implements BaseCalendar {
     }
 
     floorToWeekStart(date: Date) {
-        return DE.floorWeek(date);
+        return DE.floorWeek(date, this.privateStartDay());
     }
 
     ceilToWeekEnd(date: Date) {
-        return DE.ceilWeek(date);
+        return DE.ceilWeek(date, this.privateStartDay());
     }
 
     getDateRange(): DateRange {
         var events = this.parsedEvents();
         var dates = [];
+
         events.forEach(event => {
             dates.push(event.start);
             dates.push(event.end);
@@ -253,8 +268,8 @@ class Calendar implements BaseCalendar {
         var range = DE.dateRange(dates);
 
         return {
-            start: DE.floorWeek(range.start),
-            end: DE.ceilWeek(range.end)
+            start: this.floorToWeekStart(range.start),
+            end: this.ceilToWeekEnd(range.end)
         };
     }
 }

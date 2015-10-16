@@ -1,4 +1,14 @@
 var DE = require('date-equality');
+if (typeof ko === 'undefined') {
+    if (typeof require === 'undefined')
+        throw new Error('Knockout is required to use Ko-Calendar');
+    try {
+        ko = require('knockout');
+    }
+    catch (ex) {
+        throw new Error('Knockout is required to use Ko-Calendar');
+    }
+}
 var Calendar = (function () {
     function Calendar(parser) {
         var _this = this;
@@ -43,10 +53,12 @@ var Calendar = (function () {
         this.privateStartDay = ko.observable(0);
         this.startDay = ko.pureComputed({
             read: function () { return _this.privateStartDay(); },
-            write: function (dayOfWeek) { return _this.privateStartDay(Math.abs(dayOfWeek) % 7); },
+            write: function (dayOfWeek) {
+                _this.privateStartDay(DE.startDay(dayOfWeek));
+            },
             owner: this
         });
-        this.endDay = ko.computed(function () { return _this.startDay() === 0 ? 6 : _this.startDay() - 1; });
+        this.endDay = ko.computed(function () { return DE.endDay(_this.privateStartDay()); });
         this.eventsForDate = ko.computed(function () {
             var forDate = _this.eventsDate();
             var events = _this.parsedEvents().filter(function (event) { return _this.isInRange(forDate, event); });
@@ -97,11 +109,17 @@ var Calendar = (function () {
             }
             return weekEvents;
         });
+        this.currentMonth = ko.observable({ year: 0, month: 0 });
         this.eventsForMonth = ko.computed(function () {
             var weeks = _this.eventsByWeek();
             var current = _this.currentMonth();
             var isMonth = function (date) { return date.getFullYear() === current.year && date.getMonth() === current.month; };
-            return weeks.filter(function (week) { return isMonth(week.start) || isMonth(week.end); });
+            var weeks = weeks.filter(function (week) { return isMonth(week.start) || isMonth(week.end); });
+            return {
+                weeks: weeks,
+                start: null,
+                end: null
+            };
         });
         this.previousMonth = function () { };
         this.nextMonth = function () { };
@@ -111,13 +129,9 @@ var Calendar = (function () {
                 return { year: new Date().getFullYear(), month: new Date().getMonth() };
             return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
         };
-        this.currentMonth = ko.observable({ year: 0, month: 0 });
         this.weekDays = ko.computed(function () {
             var days = _this.eventsByDay().slice(0, 7);
             return days.map(function (day) { return day.date.toString().slice(0, 3); });
-        });
-        this.privateStartDay.subscribe(function (day) {
-            DE.startOfWeek(day);
         });
         if (!parser)
             return;
@@ -177,10 +191,10 @@ var Calendar = (function () {
         return DE.ceilDay(date);
     };
     Calendar.prototype.floorToWeekStart = function (date) {
-        return DE.floorWeek(date);
+        return DE.floorWeek(date, this.privateStartDay());
     };
     Calendar.prototype.ceilToWeekEnd = function (date) {
-        return DE.ceilWeek(date);
+        return DE.ceilWeek(date, this.privateStartDay());
     };
     Calendar.prototype.getDateRange = function () {
         var events = this.parsedEvents();
@@ -191,8 +205,8 @@ var Calendar = (function () {
         });
         var range = DE.dateRange(dates);
         return {
-            start: DE.floorWeek(range.start),
-            end: DE.ceilWeek(range.end)
+            start: this.floorToWeekStart(range.start),
+            end: this.ceilToWeekEnd(range.end)
         };
     };
     return Calendar;
