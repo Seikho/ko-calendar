@@ -1,29 +1,23 @@
-import * as Types from './index';
+import * as Types from '../index.d.ts';
 import Parser = Types.Parser;
 import WeekEvent = Types.WeekEvent;
 import DayEvent = Types.DayEvent;
 import BaseCalendar = Types.Calendar;
 import CalendarEvent = Types.CalendarEvent;
 import DateRange = Types.DateRange;
+import MonthEvent = Types.MonthEvent;
+import DE = require('date-equality');
 
-declare var ko;
-var requireExists = typeof window === 'undefined'
-    ? typeof require === 'function'
-    : typeof window['require'] === 'function';
+export = Calendar;
 
-
-
-if (typeof ko === 'undefined') {
-    if (!requireExists) {
-        throw new Error("Unable to load knockout");
-    }
-
-    ko = typeof window === 'undefined' ? require('knockout') : window['require']('knockout');
-}
 
 class Calendar implements BaseCalendar {
 
     constructor(parser?: Parser) {
+        this.privateStartDay.subscribe(day => {
+           DE.startOfWeek(day); 
+        });
+        
         if (!parser) return;
 
         if (typeof parser !== 'function') {
@@ -178,6 +172,25 @@ class Calendar implements BaseCalendar {
         return weekEvents;
     });
 
+    eventsForMonth: KnockoutComputed<MonthEvent> = ko.computed(() => {
+        var weeks = this.eventsByWeek();
+        var current = this.currentMonth();
+        var isMonth = (date: Date) => date.getFullYear() === current.year && date.getMonth() === current.month;
+
+        return weeks.filter(week => isMonth(week.start) || isMonth(week.end));
+    });
+
+    previousMonth = () => { }
+    nextMonth = () => { }
+
+    firstMonth = () => {
+        var firstEvent = this.eventsByDay()[0];
+        if (!firstEvent) return { year: new Date().getFullYear(), month: new Date().getMonth() };
+        return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
+    }
+
+    currentMonth: KnockoutObservable<{ year: number, month: number }> = ko.observable({ year: 0, month: 0 });
+
     weekDays = ko.computed(() => {
         var days = this.eventsByDay().slice(0, 7);
         return days.map(day => day.date.toString().slice(0, 3));
@@ -202,89 +215,46 @@ class Calendar implements BaseCalendar {
     }
 
     isSameDate(left: Date, right: Date): boolean {
-        var sameYear = left.getFullYear() === right.getFullYear();
-        var sameMonth = left.getMonth() === right.getMonth();
-        var sameDay = left.getDate() === right.getDate();
-
-        return sameYear && sameMonth && sameDay;
+        return DE.sameDate(left, right);
     }
 
     isSameWeek(left: Date, right: Date): boolean {
-        var sameYear = left.getFullYear() === right.getFullYear();
-        var sameMonth = left.getMonth() === right.getMonth();
-        if (!sameYear || !sameMonth) return false;
-
-        var leftFloor = this.floorToWeekStart(left);
-        var leftCeil = this.ceilToWeekEnd(left);
-
-        return right >= leftFloor && right <= leftCeil;
+        return DE.sameWeek(left, right);
     }
 
     isInRange(date: Date, range: DateRange): boolean {
-        var sameAsStart = this.isSameDate(date, range.start);
-        var sameAsEnd = this.isSameDate(date, range.end);
-        var isInRange = date >= range.start && date <= range.end;
-
-        return sameAsStart || sameAsEnd || isInRange;
+        return DE.inRange(date, range);
     }
 
     floorToDay(date: Date) {
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        return DE.floorDay(date);
     }
 
     ceilToDay(date: Date) {
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+        return DE.ceilDay(date);
     }
 
     floorToWeekStart(date: Date) {
-        var currentDay = date.getDay();
-        var toDay = this.startDay();
-        var downDate = new Date(date.getTime());
-
-        if (currentDay > toDay)
-            downDate.setDate(downDate.getDate() - (currentDay - toDay));
-
-        if (currentDay < toDay)
-            downDate.setDate(downDate.getDate() - (currentDay + (7 - toDay)));
-
-        return this.floorToDay(downDate);
+        return DE.floorWeek(date);
     }
 
     ceilToWeekEnd(date: Date) {
-        var currentDay = date.getDay();
-        var toDay = this.endDay();
-        var upDate = new Date(date.getTime());
-
-        if (currentDay > toDay)
-            upDate.setDate(upDate.getDate() + (7 - currentDay + toDay));
-
-        if (currentDay < toDay)
-            upDate.setDate(upDate.getDate() + (toDay - currentDay));
-
-        return this.ceilToDay(upDate);
+        return DE.ceilWeek(date);
     }
 
     getDateRange(): DateRange {
         var events = this.parsedEvents();
-        var start, end;
-
+        var dates = [];
         events.forEach(event => {
-            if (start == null || event.start < start) start = new Date(event.start.getTime());
-            if (end == null || event.end > end) end = new Date(event.end.getTime());
+            dates.push(event.start);
+            dates.push(event.end);
         });
 
-        if (start == null) start = new Date();
-        if (end == null) end = new Date(start.getTime());
-        
-        // We get a little bit opinionated here...
-        start = this.floorToWeekStart(start);
-        end = this.ceilToWeekEnd(end);
+        var range = DE.dateRange(dates);
 
-        return { start, end };
+        return {
+            start: DE.floorWeek(range.start),
+            end: DE.ceilWeek(range.end)
+        };
     }
-}
-
-if (typeof exports !== 'undefined') {
-    module.exports = Calendar;
-    module.exports.default = Calendar;
 }

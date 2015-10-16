@@ -5,7 +5,7 @@
   "main": "ko-calendar.js",
   "scripts": {
     "test": "mocha",
-    "build": "tsc"
+    "build": "tsc && webpack ko-calendar.js kocal.js"
   },
   "repository": {
     "type": "git",
@@ -25,11 +25,13 @@
   },
   "homepage": "https://github.com/seikho/ko-calendar#readme",
   "devDependencies": {
+    "browserify": "^11.2.0",
     "chai": "^3.2.0",
+    "date-equality": "^0.1.2",
+    "knockout": "^3.3.0",
     "mocha": "^2.3.2",
     "typescript": "^1.6.2",
-    "knockout": "^3.3.0"
+    "webpack": "^1.12.2"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
