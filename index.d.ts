@@ -45,7 +45,6 @@ export interface Parser {
 }
 
 export interface MonthEvent extends DateRange {
-    monthNumber: number;
     weeks: Array<WeekEvent>;
 }
 
