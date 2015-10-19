@@ -4,6 +4,7 @@
 <head>
     <title>KoCalendar demo</title>
 </head>
+
 <body>
     <h3>Ko-calendar test</h3>
     <div id="target"></div>
@@ -14,6 +15,9 @@
        "baseUrl": "../",
        "paths": {
            "knockout": "//cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min"
+       },
+       "shim": {
+           "ko-calendar": ["knockout"]
        }
     });
 
@@ -27,27 +31,30 @@
         return now;
     }
     
-    require(["ko-calendar", "knockout"], function(KoCal) {
-        var calendar = new KoCal.Calendar();
-        
-        var sampleDates = [
-            addDate(),
-            addDate(1),
-            addDate(2),
-            addDate(3),
-            addDate(4),
-        ];
-        
-        calendar.addEvents(sampleDates);
-        var events = calendar.eventsByDay();
-        var eventsToHtml = events.map(function(event) { 
-           return '<pre>' + JSON.stringify(event) + '</pre>'; 
-        });
-        
-        
-        document.getElementById('target').innerHTML = eventsToHtml.join(' ');
-    });
+    require(["knockout"], function(ko) {
+        window.ko = ko;
+        require(["ko-calendar"], function() {
 
+            var calendar = new Calendar();
+            
+            var sampleDates = [
+                addDate(),
+                addDate(1),
+                addDate(2),
+                addDate(3),
+                addDate(4),
+            ];
+            
+            calendar.addEvents(sampleDates);
+            var events = calendar.eventsByDay();
+            var eventsToHtml = events.map(function(event) { 
+            return '<pre>' + JSON.stringify(event) + '</pre>'; 
+            });
+            
+            
+            document.getElementById('target').innerHTML = eventsToHtml.join(' ');
+        });
+    });
 
 </script>
 
