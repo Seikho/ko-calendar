@@ -11,14 +11,8 @@ import DE = require('date-equality');
 export = Calendar;
 
 declare var ko: any;
-if (typeof ko === 'undefined') {
-    if (typeof require === 'undefined') throw new Error('Knockout is required to use Ko-Calendar');
-    try {
-        ko = require('knockout');
-    } catch (ex) {
-        throw new Error('Knockout is required to use Ko-Calendar');
-    }
-}
+if (typeof ko === 'undefined')
+    throw new Error('Knockout is required to use Ko-Calendar');
 
 class Calendar implements BaseCalendar {
 
@@ -195,8 +189,13 @@ class Calendar implements BaseCalendar {
         }
     });
 
-    previousMonth = () => { }
-    nextMonth = () => { }
+    previousMonth = () => {
+
+    }
+
+    nextMonth = () => {
+
+    }
 
     firstMonth = () => {
         var firstEvent = this.eventsByDay()[0];
@@ -233,7 +232,7 @@ class Calendar implements BaseCalendar {
     }
 
     isSameWeek(left: Date, right: Date): boolean {
-        return DE.sameWeek(left, right);
+        return DE.sameWeek(left, right, this.privateStartDay());
     }
 
     isInRange(date: Date, range: DateRange): boolean {
@@ -273,3 +272,5 @@ class Calendar implements BaseCalendar {
         };
     }
 }
+
+if (typeof window !== 'undefined') window['Calendar'] = Calendar;

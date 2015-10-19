@@ -1,14 +1,6 @@
 var DE = require('date-equality');
-if (typeof ko === 'undefined') {
-    if (typeof require === 'undefined')
-        throw new Error('Knockout is required to use Ko-Calendar');
-    try {
-        ko = require('knockout');
-    }
-    catch (ex) {
-        throw new Error('Knockout is required to use Ko-Calendar');
-    }
-}
+if (typeof ko === 'undefined')
+    throw new Error('Knockout is required to use Ko-Calendar');
 var Calendar = (function () {
     function Calendar(parser) {
         var _this = this;
@@ -121,8 +113,10 @@ var Calendar = (function () {
                 end: null
             };
         });
-        this.previousMonth = function () { };
-        this.nextMonth = function () { };
+        this.previousMonth = function () {
+        };
+        this.nextMonth = function () {
+        };
         this.firstMonth = function () {
             var firstEvent = _this.eventsByDay()[0];
             if (!firstEvent)
@@ -179,7 +173,7 @@ var Calendar = (function () {
         return DE.sameDate(left, right);
     };
     Calendar.prototype.isSameWeek = function (left, right) {
-        return DE.sameWeek(left, right);
+        return DE.sameWeek(left, right, this.privateStartDay());
     };
     Calendar.prototype.isInRange = function (date, range) {
         return DE.inRange(date, range);
@@ -211,4 +205,6 @@ var Calendar = (function () {
     };
     return Calendar;
 })();
+if (typeof window !== 'undefined')
+    window['Calendar'] = Calendar;
 module.exports = Calendar;
