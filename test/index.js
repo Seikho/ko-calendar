@@ -1,7 +1,9 @@
 var chai = require('chai');
-var KoCalendar = require('../src/ko-calendar');
+var ko = require('knockout');
+global['ko'] = ko;
+var Calendar = require('../src/ko-calendar');
 var expect = chai.expect;
-var cal = new KoCalendar();
+var cal = new Calendar();
 var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
 describe('equivalence tests', function () {
     it('will find two dates equivalent', function () {

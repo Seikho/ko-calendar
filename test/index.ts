@@ -1,8 +1,11 @@
 import chai = require('chai');
 import * as Types from '../index';
-var KoCalendar = require('../src/ko-calendar');
+import ko = require('knockout');
+global['ko'] = ko;
+
+import Calendar = require('../src/ko-calendar');
 var expect = chai.expect;
-var cal: Types.Calendar = new KoCalendar();
+var cal: Types.Calendar = new Calendar();
 
 var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
 
