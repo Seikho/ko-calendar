@@ -8,12 +8,9 @@ import DateRange = Types.DateRange;
 import MonthEvent = Types.MonthEvent;
 import DE = require('date-equality');
 
-export = Calendar;
-
 declare var ko: any;
 
-
-class Calendar implements BaseCalendar {
+export class Calendar implements BaseCalendar {
 
     constructor(parser?: Parser) {
         this.events.subscribe(this.setFirstMonth);

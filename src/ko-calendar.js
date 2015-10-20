@@ -233,6 +233,6 @@ var Calendar = (function () {
     };
     return Calendar;
 })();
+exports.Calendar = Calendar;
 if (typeof require === 'undefined' && typeof window !== 'undefined')
     window['Calendar'] = Calendar;
-module.exports = Calendar;

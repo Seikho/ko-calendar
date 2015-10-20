@@ -280,9 +280,9 @@ module.exports =
 	    };
 	    return Calendar;
 	})();
+	exports.Calendar = Calendar;
 	if (false)
 	    window['Calendar'] = Calendar;
-	module.exports = Calendar;
 
 
 /***/ },
