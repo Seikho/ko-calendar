@@ -117,6 +117,24 @@ describe('get events tests', () => {
         expect(events[0].date.toUTCString()).to.equal(new Date(2014, 11, 28, 0, 0, 0).toUTCString());
         expect(events.slice(-1)[0].date.toUTCString()).to.equal(new Date(2015, 0, 10, 0, 0, 0).toUTCString());
     });
+    
+    it('will implicitly have "currentMonth" values', () => {
+       var current = cal['currentMonth']();
+       expect(current.month).to.equal(11);
+       expect(current.year).to.equal(2014);
+    });
+    
+    it('will allocate correct number of weeks to MonthEvent', () => {
+        var month = cal.eventsForMonth();        
+       expect(month.weeks.length).to.equal(5); 
+    });
+    
+    it('will change the month', () => {
+        cal.nextMonth();
+        var current = cal['currentMonth']();
+        expect(current.year).to.equal(2015);
+        expect(current.month).to.equal(0);
+    });
 });
 
 function addDate(daysFromNow?: number) {
