@@ -1,11 +1,11 @@
 {
   "name": "ko-calendar",
   "version": "0.6.1",
-  "description": "Knockout Calendar API",
+  "description": "Knockout Calendar ViewModel",
   "main": "src/ko-calendar.js",
   "scripts": {
     "test": "mocha",
-    "build": "tsc && webpack src/ko-calendar.js ko-calendar.js"
+    "build": "tsc && webpack"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "date-equality": "^0.3.1",
+    "exports-loader": "^0.6.2",
     "knockout": "^3.3.0",
     "mocha": "^2.3.2",
     "typescript": "^1.6.2",
