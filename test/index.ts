@@ -3,9 +3,9 @@ import * as Types from '../index';
 import ko = require('knockout');
 global['ko'] = ko;
 
-var Calendar = require('../ko-calendar');
+var Cal = require('../ko-calendar');
 var expect = chai.expect;
-var cal: Types.Calendar = new Calendar();
+var cal: Types.Calendar = new Cal.Calendar();
 
 var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
 

@@ -1,9 +1,9 @@
 var chai = require('chai');
 var ko = require('knockout');
 global['ko'] = ko;
-var Calendar = require('../ko-calendar');
+var Cal = require('../ko-calendar');
 var expect = chai.expect;
-var cal = new Calendar();
+var cal = new Cal.Calendar();
 var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
 describe('ordered days of week tests', function () {
     it('will calculate the ordered days of the week with no data provided', function () {
