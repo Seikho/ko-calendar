@@ -116,10 +116,20 @@ var Calendar = (function () {
             }
             return weekEvents;
         });
-        this.currentMonth = ko.observable({ year: 0, month: 0 });
+        this.firstMonth = function () {
+            var firstEvent = _this.eventsByDay()[0];
+            if (!firstEvent)
+                return { year: new Date().getFullYear(), month: new Date().getMonth() };
+            return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
+        };
+        this.currentMonth = ko.observable({ year: 0, month: -1 });
         this.eventsForMonth = ko.computed(function () {
             var weeks = [];
             var current = _this.currentMonth();
+            if (current.year === 0) {
+                _this.currentMonth(_this.firstMonth());
+                current = _this.currentMonth();
+            }
             var iterator = new Date(current.year, current.month, 1);
             var isThisMonth = function () {
                 var floor = DE.floorWeek(iterator, _this.privateStartDay());
@@ -161,12 +171,6 @@ var Calendar = (function () {
                 current.year++;
             }
             _this.currentMonth(current);
-        };
-        this.firstMonth = function () {
-            var firstEvent = _this.eventsByDay()[0];
-            if (!firstEvent)
-                return { year: new Date().getFullYear(), month: new Date().getMonth() };
-            return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
         };
         this.weekDays = ko.computed(function () {
             var days = _this.eventsByDay().slice(0, 7);

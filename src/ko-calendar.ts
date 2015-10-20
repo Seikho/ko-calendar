@@ -15,8 +15,7 @@ declare var ko: any;
 
 class Calendar implements BaseCalendar {
 
-    constructor(parser?: Parser) {
-
+    constructor(parser?: Parser) {       
         if (!parser) return;
 
         if (typeof parser !== 'function') {
@@ -25,8 +24,9 @@ class Calendar implements BaseCalendar {
         }
 
         this.parser = parser;
+
     }
-        
+
     eventsDate = ko.observable(new Date());
 
     parser: Parser = (userObject: any) => {
@@ -170,13 +170,13 @@ class Calendar implements BaseCalendar {
         var weekEvents: WeekEvent[] = [];
 
         var iterator = new Date(range.start.getTime());
-        
+
         var canAddWeek = () => {
             var ceil = DE.ceilWeek(iterator, this.privateStartDay());
             return ceil <= range.end;
         }
-        
-        var to = (date: Date) => `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
+
+        var to = (date: Date) => `${date.getDate() }/${date.getMonth() + 1}/${date.getFullYear() }`;
 
         while (canAddWeek()) {
             var weekEvent = this.eventsForWeek(iterator);
@@ -186,13 +186,23 @@ class Calendar implements BaseCalendar {
 
         return weekEvents;
     });
+    
+    firstMonth = () => {
+        var firstEvent = this.eventsByDay()[0];        
+        if (!firstEvent) return { year: new Date().getFullYear(), month: new Date().getMonth() };
+        return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
+    }
 
-
-    currentMonth: KnockoutObservable<{ year: number, month: number }> = ko.observable({ year: 0, month: 0 });
+    currentMonth: KnockoutObservable<{ year: number, month: number }> = ko.observable({ year: 0, month: -1 });
 
     eventsForMonth: KnockoutComputed<MonthEvent> = ko.computed(() => {
         var weeks: Array<WeekEvent> = [];
         var current = this.currentMonth();
+        
+        if (current.year === 0) {
+            this.currentMonth(this.firstMonth());
+            current = this.currentMonth();
+        }
 
         var iterator = new Date(current.year, current.month, 1);
         var isThisMonth = () => {
@@ -246,25 +256,18 @@ class Calendar implements BaseCalendar {
         this.currentMonth(current);
     }
 
-    firstMonth = () => {
-        var firstEvent = this.eventsByDay()[0];
-        if (!firstEvent) return { year: new Date().getFullYear(), month: new Date().getMonth() };
-        return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
-    }
-
-
     weekDays = ko.computed(() => {
         var days = this.eventsByDay().slice(0, 7);
         return days.map(day => day.date.toString().slice(0, 3));
     });
-    
+
     sortByDate(events: Array<CalendarEvent>) {
         var newArray = events.slice();
 
         return newArray.sort((left, right) => left.start > right.start ? 1 : -1);
     }
 
-    weeksInDateRange (start: Date, end: Date) {
+    weeksInDateRange(start: Date, end: Date) {
         var weeks = 0;
         var iterator = new Date(start.getTime());;
 
@@ -275,7 +278,7 @@ class Calendar implements BaseCalendar {
 
         return weeks;
     }
-    
+
     getDateRange(): DateRange {
         var events = this.parsedEvents();
         var dates = [];
