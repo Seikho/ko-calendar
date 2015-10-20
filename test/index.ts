@@ -3,7 +3,7 @@ import * as Types from '../index';
 import ko = require('knockout');
 global['ko'] = ko;
 
-import Calendar = require('../src/ko-calendar');
+var Calendar = require('../ko-calendar');
 var expect = chai.expect;
 var cal: Types.Calendar = new Calendar();
 

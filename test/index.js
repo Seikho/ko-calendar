@@ -1,7 +1,7 @@
 var chai = require('chai');
 var ko = require('knockout');
 global['ko'] = ko;
-var Calendar = require('../src/ko-calendar');
+var Calendar = require('../ko-calendar');
 var expect = chai.expect;
 var cal = new Calendar();
 var baseDate = new Date(2015, 0, 1); // Thu, 1 Jan 2015
