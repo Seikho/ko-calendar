@@ -1,8 +1,8 @@
 {
   "name": "ko-calendar",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Knockout Calendar ViewModel",
-  "main": "src/ko-calendar.js",
+  "main": "./ko-calendar.js",
   "scripts": {
     "test": "mocha",
     "build": "tsc && webpack"
