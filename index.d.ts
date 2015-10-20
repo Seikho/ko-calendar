@@ -23,20 +23,6 @@ export class Calendar {
 
     weeksInDateRange(start: Date, end: Date): number;
 
-    isSameDate(left: Date, right: Date): boolean;
-
-    isSameWeek(left: Date, right: Date): boolean;
-
-    isInRange(date: Date, range: DateRange): boolean;
-
-    floorToDay(date: Date): Date;
-
-    ceilToDay(date: Date): Date;
-
-    floorToWeekStart(date: Date): Date;
-
-    ceilToWeekEnd(date: Date): Date;
-
     getDateRange(): DateRange;    
 }
 
