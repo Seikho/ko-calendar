@@ -1,3 +1,4 @@
+module.exports =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -45,8 +46,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var DE = __webpack_require__(1);
-	if (typeof ko === 'undefined')
-	    throw new Error('Knockout is required to use Ko-Calendar');
 	var Calendar = (function () {
 	    function Calendar(parser) {
 	        var _this = this;
@@ -97,11 +96,19 @@
 	            owner: this
 	        });
 	        this.endDay = ko.computed(function () { return DE.endDay(_this.privateStartDay()); });
+	        this.addEvent = function (userObject) {
+	            _this.events.push(userObject);
+	        };
+	        this.addEvents = function (userObjects) {
+	            var events = _this.events();
+	            events = events.concat(userObjects);
+	            _this.events(events);
+	        };
 	        this.eventsForDate = ko.computed(function () {
 	            var forDate = _this.eventsDate();
-	            var events = _this.parsedEvents().filter(function (event) { return _this.isInRange(forDate, event); });
+	            var events = _this.parsedEvents().filter(function (event) { return DE.inRange(forDate, event); });
 	            return {
-	                date: _this.floorToDay(forDate),
+	                date: DE.floorDay(forDate),
 	                events: events
 	            };
 	        });
@@ -111,7 +118,7 @@
 	            var dayEvents = [];
 	            var iterator = new Date(range.start.getTime());
 	            while (iterator < range.end) {
-	                var currentEvents = events.filter(function (event) { return _this.isInRange(iterator, event); });
+	                var currentEvents = events.filter(function (event) { return DE.inRange(iterator, event); });
 	                dayEvents.push({
 	                    date: new Date(iterator.getTime()),
 	                    events: currentEvents
@@ -120,48 +127,87 @@
 	            }
 	            return dayEvents;
 	        });
+	        this.eventsForWeek = function (date) {
+	            var iterator = DE.floorWeek(date, _this.privateStartDay());
+	            var end = DE.ceilWeek(date, _this.privateStartDay());
+	            var events = _this.parsedEvents();
+	            var weekEvent = {
+	                start: DE.floorWeek(date, _this.privateStartDay()),
+	                end: end,
+	                days: []
+	            };
+	            while (iterator <= end) {
+	                var dayEvents = events.filter(function (event) { return DE.inRange(iterator, event); });
+	                weekEvent.days.push({
+	                    date: new Date(iterator.getTime()),
+	                    events: dayEvents
+	                });
+	                iterator.setDate(iterator.getDate() + 1);
+	            }
+	            return weekEvent;
+	        };
 	        this.eventsByWeek = ko.computed(function () {
 	            var events = _this.parsedEvents();
 	            var range = _this.getDateRange();
 	            var weekEvents = [];
 	            var iterator = new Date(range.start.getTime());
-	            var weekNumber = 1;
-	            while (iterator < range.end) {
-	                var currentDay = iterator;
-	                var endOfWeek = _this.ceilToWeekEnd(iterator);
-	                var week = {
-	                    start: new Date(iterator.getTime()),
-	                    end: endOfWeek,
-	                    weekNumber: weekNumber,
-	                    days: []
-	                };
-	                while (currentDay < endOfWeek) {
-	                    var dayEvents = events.filter(function (event) { return _this.isInRange(currentDay, event); });
-	                    week.days.push({
-	                        date: currentDay,
-	                        events: dayEvents
-	                    });
-	                    currentDay.setDate(currentDay.getDate() + 1);
-	                }
-	                weekEvents.push(week);
+	            var canAddWeek = function () {
+	                var ceil = DE.ceilWeek(iterator, _this.privateStartDay());
+	                return ceil <= range.end;
+	            };
+	            var to = function (date) { return (date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()); };
+	            while (canAddWeek()) {
+	                var weekEvent = _this.eventsForWeek(iterator);
+	                weekEvents.push(weekEvent);
+	                iterator.setDate(iterator.getDate() + 7);
 	            }
 	            return weekEvents;
 	        });
 	        this.currentMonth = ko.observable({ year: 0, month: 0 });
 	        this.eventsForMonth = ko.computed(function () {
-	            var weeks = _this.eventsByWeek();
+	            var weeks = [];
 	            var current = _this.currentMonth();
-	            var isMonth = function (date) { return date.getFullYear() === current.year && date.getMonth() === current.month; };
-	            var weeks = weeks.filter(function (week) { return isMonth(week.start) || isMonth(week.end); });
+	            var iterator = new Date(current.year, current.month, 1);
+	            var isThisMonth = function () {
+	                var floor = DE.floorWeek(iterator, _this.privateStartDay());
+	                var ceil = DE.ceilWeek(iterator, _this.privateStartDay());
+	                return floor.getMonth() === current.month || ceil.getMonth() === current.month;
+	            };
+	            while (isThisMonth()) {
+	                var weekEvent = _this.eventsForWeek(iterator);
+	                weeks.push(weekEvent);
+	                iterator.setDate(iterator.getDate() + 7);
+	            }
+	            var events = _this.parsedEvents();
+	            var start = weeks[0].start;
+	            var end = weeks[weeks.length - 1].end;
+	            var eventsBefore = events.filter(function (event) { return event.end < start; }).length;
+	            var eventsAfter = events.filter(function (event) { return event.start > end; }).length;
 	            return {
 	                weeks: weeks,
-	                start: null,
-	                end: null
+	                start: start,
+	                end: end,
+	                before: eventsBefore,
+	                after: eventsAfter
 	            };
 	        });
 	        this.previousMonth = function () {
+	            var current = _this.currentMonth();
+	            current.month--;
+	            if (current.month < 0) {
+	                current.month = 11;
+	                current.year--;
+	            }
+	            _this.currentMonth(current);
 	        };
 	        this.nextMonth = function () {
+	            var current = _this.currentMonth();
+	            current.month++;
+	            if (current.month > 11) {
+	                current.month = 0;
+	                current.year++;
+	            }
+	            _this.currentMonth(current);
 	        };
 	        this.firstMonth = function () {
 	            var firstEvent = _this.eventsByDay()[0];
@@ -193,14 +239,6 @@
 	        }
 	        return parsedObject;
 	    };
-	    Calendar.prototype.addEvent = function (userObject) {
-	        this.events.push(userObject);
-	    };
-	    Calendar.prototype.addEvents = function (userObjects) {
-	        var events = this.events();
-	        events = events.concat(userObjects);
-	        this.events(events);
-	    };
 	    Calendar.prototype.sortByDate = function (events) {
 	        var newArray = events.slice();
 	        return newArray.sort(function (left, right) { return left.start > right.start ? 1 : -1; });
@@ -215,27 +253,6 @@
 	        }
 	        return weeks;
 	    };
-	    Calendar.prototype.isSameDate = function (left, right) {
-	        return DE.sameDate(left, right);
-	    };
-	    Calendar.prototype.isSameWeek = function (left, right) {
-	        return DE.sameWeek(left, right, this.privateStartDay());
-	    };
-	    Calendar.prototype.isInRange = function (date, range) {
-	        return DE.inRange(date, range);
-	    };
-	    Calendar.prototype.floorToDay = function (date) {
-	        return DE.floorDay(date);
-	    };
-	    Calendar.prototype.ceilToDay = function (date) {
-	        return DE.ceilDay(date);
-	    };
-	    Calendar.prototype.floorToWeekStart = function (date) {
-	        return DE.floorWeek(date, this.privateStartDay());
-	    };
-	    Calendar.prototype.ceilToWeekEnd = function (date) {
-	        return DE.ceilWeek(date, this.privateStartDay());
-	    };
 	    Calendar.prototype.getDateRange = function () {
 	        var events = this.parsedEvents();
 	        var dates = [];
@@ -245,13 +262,13 @@
 	        });
 	        var range = DE.dateRange(dates);
 	        return {
-	            start: this.floorToWeekStart(range.start),
-	            end: this.ceilToWeekEnd(range.end)
+	            start: DE.floorWeek(range.start, this.privateStartDay()),
+	            end: DE.ceilWeek(range.end, this.privateStartDay())
 	        };
 	    };
 	    return Calendar;
 	})();
-	if (typeof window !== 'undefined')
+	if (false)
 	    window['Calendar'] = Calendar;
 	module.exports = Calendar;
 

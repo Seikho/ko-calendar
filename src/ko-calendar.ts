@@ -11,8 +11,7 @@ import DE = require('date-equality');
 export = Calendar;
 
 declare var ko: any;
-if (typeof ko === 'undefined')
-    throw new Error('Knockout is required to use Ko-Calendar');
+
 
 class Calendar implements BaseCalendar {
 
@@ -27,7 +26,7 @@ class Calendar implements BaseCalendar {
 
         this.parser = parser;
     }
-
+        
     eventsDate = ko.observable(new Date());
 
     parser: Parser = (userObject: any) => {
@@ -103,11 +102,11 @@ class Calendar implements BaseCalendar {
 
     endDay = ko.computed(() => DE.endDay(this.privateStartDay()));
 
-    addEvent(userObject: any): void {
+    addEvent = (userObject: any): void => {
         this.events.push(userObject);
     }
 
-    addEvents(userObjects: any[]): void {
+    addEvents = (userObjects: any[]): void => {
         var events = this.events();
         events = events.concat(userObjects);
         this.events(events);
@@ -115,10 +114,10 @@ class Calendar implements BaseCalendar {
 
     eventsForDate: KnockoutComputed<DayEvent> = ko.computed((): DayEvent => {
         var forDate = this.eventsDate();
-        var events = this.parsedEvents().filter(event => this.isInRange(forDate, event));
+        var events = this.parsedEvents().filter(event => DE.inRange(forDate, event));
 
         return {
-            date: this.floorToDay(forDate),
+            date: DE.floorDay(forDate),
             events
         };
     });
@@ -130,7 +129,7 @@ class Calendar implements BaseCalendar {
 
         var iterator = new Date(range.start.getTime());
         while (iterator < range.end) {
-            var currentEvents = events.filter(event => this.isInRange(iterator, event));
+            var currentEvents = events.filter(event => DE.inRange(iterator, event));
             dayEvents.push({
                 date: new Date(iterator.getTime()),
                 events: currentEvents
@@ -141,60 +140,110 @@ class Calendar implements BaseCalendar {
         return dayEvents;
     });
 
-    eventsByWeek: KnockoutComputed<Array<WeekEvent>> = ko.computed((): Array<WeekEvent> => {
+    eventsForWeek = (date: Date): WeekEvent => {
+        var iterator = DE.floorWeek(date, this.privateStartDay());
+        var end = DE.ceilWeek(date, this.privateStartDay());
+        var events = this.parsedEvents();
+
+        var weekEvent: WeekEvent = {
+            start: DE.floorWeek(date, this.privateStartDay()),
+            end,
+            days: []
+        };
+
+        while (iterator <= end) {
+            var dayEvents = events.filter(event => DE.inRange(iterator, event));
+            weekEvent.days.push({
+                date: new Date(iterator.getTime()),
+                events: dayEvents
+            });
+
+            iterator.setDate(iterator.getDate() + 1);
+        }
+
+        return weekEvent;
+    }
+
+    eventsByWeek: KnockoutComputed<Array<WeekEvent>> = ko.computed(() => {
         var events = this.parsedEvents();
         var range = this.getDateRange();
         var weekEvents: WeekEvent[] = [];
 
         var iterator = new Date(range.start.getTime());
-        var weekNumber = 1;
-        while (iterator < range.end) {
-            var currentDay = iterator;
-            var endOfWeek = this.ceilToWeekEnd(iterator)
-            var week: WeekEvent = {
-                start: new Date(iterator.getTime()),
-                end: endOfWeek,
-                weekNumber,
-                days: []
-            };
+        
+        var canAddWeek = () => {
+            var ceil = DE.ceilWeek(iterator, this.privateStartDay());
+            return ceil <= range.end;
+        }
+        
+        var to = (date: Date) => `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
 
-            while (currentDay < endOfWeek) {
-                var dayEvents = events.filter(event => this.isInRange(currentDay, event));
-                week.days.push({
-                    date: currentDay,
-                    events: dayEvents
-                });
-
-                currentDay.setDate(currentDay.getDate() + 1);
-            }
-
-            weekEvents.push(week);
+        while (canAddWeek()) {
+            var weekEvent = this.eventsForWeek(iterator);
+            weekEvents.push(weekEvent);
+            iterator.setDate(iterator.getDate() + 7);
         }
 
         return weekEvents;
     });
+
+
     currentMonth: KnockoutObservable<{ year: number, month: number }> = ko.observable({ year: 0, month: 0 });
 
     eventsForMonth: KnockoutComputed<MonthEvent> = ko.computed(() => {
-        var weeks = this.eventsByWeek();
+        var weeks: Array<WeekEvent> = [];
         var current = this.currentMonth();
-        var isMonth = (date: Date) => date.getFullYear() === current.year && date.getMonth() === current.month;
 
-        var weeks = weeks.filter(week => isMonth(week.start) || isMonth(week.end));
+        var iterator = new Date(current.year, current.month, 1);
+        var isThisMonth = () => {
+            var floor = DE.floorWeek(iterator, this.privateStartDay());
+            var ceil = DE.ceilWeek(iterator, this.privateStartDay());
+            return floor.getMonth() === current.month || ceil.getMonth() === current.month;
+        }
+
+        while (isThisMonth()) {
+            var weekEvent = this.eventsForWeek(iterator);
+            weeks.push(weekEvent);
+            iterator.setDate(iterator.getDate() + 7);
+        }
+
+        var events = this.parsedEvents();
+        var start = weeks[0].start;
+        var end = weeks[weeks.length - 1].end;
+        var eventsBefore = events.filter(event => event.end < start).length;
+        var eventsAfter = events.filter(event => event.start > end).length;
 
         return {
             weeks,
-            start: null,
-            end: null
+            start,
+            end,
+            before: eventsBefore,
+            after: eventsAfter
         }
     });
 
     previousMonth = () => {
+        var current = this.currentMonth();
+        current.month--;
 
+        if (current.month < 0) {
+            current.month = 11;
+            current.year--;
+        }
+
+        this.currentMonth(current);
     }
 
     nextMonth = () => {
+        var current = this.currentMonth();
+        current.month++;
 
+        if (current.month > 11) {
+            current.month = 0;
+            current.year++;
+        }
+
+        this.currentMonth(current);
     }
 
     firstMonth = () => {
@@ -208,14 +257,14 @@ class Calendar implements BaseCalendar {
         var days = this.eventsByDay().slice(0, 7);
         return days.map(day => day.date.toString().slice(0, 3));
     });
-
+    
     sortByDate(events: Array<CalendarEvent>) {
         var newArray = events.slice();
 
         return newArray.sort((left, right) => left.start > right.start ? 1 : -1);
     }
 
-    weeksInDateRange(start: Date, end: Date) {
+    weeksInDateRange (start: Date, end: Date) {
         var weeks = 0;
         var iterator = new Date(start.getTime());;
 
@@ -226,35 +275,7 @@ class Calendar implements BaseCalendar {
 
         return weeks;
     }
-
-    isSameDate(left: Date, right: Date): boolean {
-        return DE.sameDate(left, right);
-    }
-
-    isSameWeek(left: Date, right: Date): boolean {
-        return DE.sameWeek(left, right, this.privateStartDay());
-    }
-
-    isInRange(date: Date, range: DateRange): boolean {
-        return DE.inRange(date, range);
-    }
-
-    floorToDay(date: Date) {
-        return DE.floorDay(date);
-    }
-
-    ceilToDay(date: Date) {
-        return DE.ceilDay(date);
-    }
-
-    floorToWeekStart(date: Date) {
-        return DE.floorWeek(date, this.privateStartDay());
-    }
-
-    ceilToWeekEnd(date: Date) {
-        return DE.ceilWeek(date, this.privateStartDay());
-    }
-
+    
     getDateRange(): DateRange {
         var events = this.parsedEvents();
         var dates = [];
@@ -267,10 +288,10 @@ class Calendar implements BaseCalendar {
         var range = DE.dateRange(dates);
 
         return {
-            start: this.floorToWeekStart(range.start),
-            end: this.ceilToWeekEnd(range.end)
+            start: DE.floorWeek(range.start, this.privateStartDay()),
+            end: DE.ceilWeek(range.end, this.privateStartDay())
         };
     }
 }
 
-if (typeof window !== 'undefined') window['Calendar'] = Calendar;
+if (typeof require === 'undefined' && typeof window !== 'undefined') window['Calendar'] = Calendar;
