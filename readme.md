@@ -107,6 +107,25 @@ var events = calendar.eventsByDay();
 ```javascript
 var events = calendar.eventsByWeek();
 ```
+
+### eventsForMonth
+*Usage:* `calendar.eventsForMonth()`
+*Returns Array<[WeekEvent](#weekevent)> object*
+```javascript
+var events = calendar.eventsForMonth()`
+```
+
+### previousMonth
+Update the month that [eventsForMonth](#eventsformonth) will return
+*Usage:* `calendar.previousMonth()`
+*Returns void*
+
+### nextMonth
+Update the month that [eventsForMonth](#eventsformonth) will return
+*Usage:* `calendar.nextMonth()`
+*Returns void*
+
+
 #### DateRange
 ```javascript
 interface {
@@ -140,44 +159,6 @@ interface {
     days: Array<DayEvent>;
 }
 ```
-
-### Internal API functions
-
-#### isSameDate
-*Usage:* `calander.isSameDate(left: Date, right: Date)`  
-*Returns `boolean`*  
-Determines whether two dates fall on the same day
-
-#### isSameWeek
-*Usage:* `calander.isSameWeek(left: Date, right: Date)`  
-*Returns `boolean`*  
-Determines whether two dates fall in the same week
-
-#### floorToDay
-*Usage:* `calander.floorToDay(date: Date)`  
-*Returns `Date`*  
-Returns a new `Date` object that is the start of the provided day (00h00m00s)
-
-#### ceilToDay
-*Usage:* `calander.ceilToDay(date: Date)`  
-*Returns `Date`*  
-Returns a new `Date` object that is the end of the provided day (23h59m59m999ms)
-
-#### floorToWeekStart
-*Usage:* `calander.floorToWeekStart(date: Date)`  
-*Returns `Date`*  
-Returns a new `Date` object that is the beginning of the week of the provided date (00h00m00s)
-
-#### ceilToWeekEnd
-*Usage:* `calander.floorToWeekStart(date: Date)`  
-*Returns `Date`*  
-Returns a new `Date` object that is the end of the week of the provided date (23h59m59s999ms)
-
-#### getDateRange
-*Usage:* `calander.getDateRange()`  
-*Returns `{ start: Date, end: Date }`*  
-Returns an object containing the date range of events in the current collection.  
-The `start` and `end` dates have `floorToWeekStart` and `ceilToWeekEnd` applied to them
 
 ### License
 MIT
