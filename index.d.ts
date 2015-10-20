@@ -35,7 +35,6 @@ export interface MonthEvent extends DateRange {
 }
 
 export interface WeekEvent extends DateRange {
-    weekNumber: number;
     days: Array<DayEvent>;
 }
 
