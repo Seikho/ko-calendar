@@ -16,6 +16,12 @@ export class Calendar {
     eventsByDay: KnockoutComputed<Array<DayEvent>>;
 
     eventsByWeek: KnockoutComputed<Array<WeekEvent>>;
+    
+    eventsForMonth: KnockoutComputed<MonthEvent>;
+    
+    previousMonth: () => void;
+    
+    nextMonth: () => void;
 
     eventsForDate: KnockoutComputed<DayEvent>;
     
