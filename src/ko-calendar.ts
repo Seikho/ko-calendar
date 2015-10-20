@@ -15,7 +15,9 @@ declare var ko: any;
 
 class Calendar implements BaseCalendar {
 
-    constructor(parser?: Parser) {       
+    constructor(parser?: Parser) {
+        this.events.subscribe(this.setFirstMonth);
+
         if (!parser) return;
 
         if (typeof parser !== 'function') {
@@ -186,11 +188,19 @@ class Calendar implements BaseCalendar {
 
         return weekEvents;
     });
-    
+
     firstMonth = () => {
-        var firstEvent = this.eventsByDay()[0];        
+        var firstEvent = this.eventsByDay()[0];
         if (!firstEvent) return { year: new Date().getFullYear(), month: new Date().getMonth() };
         return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
+    }
+
+    firstEventAdded = false;
+
+    setFirstMonth = events => {
+        if (this.firstEventAdded) return;
+        this.currentMonth(this.firstMonth());
+        this.firstEventAdded = true;
     }
 
     currentMonth: KnockoutObservable<{ year: number, month: number }> = ko.observable({ year: 0, month: -1 });
@@ -198,7 +208,7 @@ class Calendar implements BaseCalendar {
     eventsForMonth: KnockoutComputed<MonthEvent> = ko.computed(() => {
         var weeks: Array<WeekEvent> = [];
         var current = this.currentMonth();
-        
+
         if (current.year === 0) {
             this.currentMonth(this.firstMonth());
             current = this.currentMonth();

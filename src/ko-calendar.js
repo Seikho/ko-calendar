@@ -122,6 +122,13 @@ var Calendar = (function () {
                 return { year: new Date().getFullYear(), month: new Date().getMonth() };
             return { year: firstEvent.date.getFullYear(), month: firstEvent.date.getMonth() };
         };
+        this.firstEventAdded = false;
+        this.setFirstMonth = function (events) {
+            if (_this.firstEventAdded)
+                return;
+            _this.currentMonth(_this.firstMonth());
+            _this.firstEventAdded = true;
+        };
         this.currentMonth = ko.observable({ year: 0, month: -1 });
         this.eventsForMonth = ko.computed(function () {
             var weeks = [];
@@ -176,6 +183,7 @@ var Calendar = (function () {
             var days = _this.eventsByDay().slice(0, 7);
             return days.map(function (day) { return day.date.toString().slice(0, 3); });
         });
+        this.events.subscribe(this.setFirstMonth);
         if (!parser)
             return;
         if (typeof parser !== 'function') {
