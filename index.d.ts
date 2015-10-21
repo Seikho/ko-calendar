@@ -22,6 +22,8 @@ export class Calendar {
     previousMonth: () => void;
     
     nextMonth: () => void;
+    
+    currentMonth: () => { year: number, month: number };
 
     eventsForDate: KnockoutComputed<DayEvent>;
     
