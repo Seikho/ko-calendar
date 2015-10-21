@@ -38,6 +38,8 @@ export interface Parser {
 
 export interface MonthEvent extends DateRange {
     weeks: Array<WeekEvent>;
+    before: number;
+    after: number;
 }
 
 export interface WeekEvent extends DateRange {
