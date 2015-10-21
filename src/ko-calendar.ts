@@ -8,7 +8,11 @@ import DateRange = Types.DateRange;
 import MonthEvent = Types.MonthEvent;
 import DE = require('date-equality');
 
-declare var ko: any;
+if (typeof ko === 'undefined') {
+    if (typeof window !== 'undefined' && typeof window['require'] !== 'undefined')
+        ko = window['require']('knockout');        
+}
+    
 
 export class Calendar implements BaseCalendar {
 

@@ -1,5 +1,4 @@
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
+(function(e, a) { for(var i in a) e[i] = a[i]; }(exports, /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -46,6 +45,10 @@ module.exports =
 /***/ function(module, exports, __webpack_require__) {
 
 	var DE = __webpack_require__(1);
+	if (typeof ko === 'undefined') {
+	    if (typeof window !== 'undefined' && typeof window['require'] !== 'undefined')
+	        ko = window['require']('knockout');
+	}
 	var Calendar = (function () {
 	    function Calendar(parser) {
 	        var _this = this;
@@ -379,4 +382,4 @@ module.exports =
 
 
 /***/ }
-/******/ ]);
+/******/ ])));

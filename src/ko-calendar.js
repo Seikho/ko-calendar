@@ -1,4 +1,8 @@
 var DE = require('date-equality');
+if (typeof ko === 'undefined') {
+    if (typeof window !== 'undefined' && typeof window['require'] !== 'undefined')
+        ko = window['require']('knockout');
+}
 var Calendar = (function () {
     function Calendar(parser) {
         var _this = this;
